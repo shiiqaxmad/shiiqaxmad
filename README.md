@@ -1,16 +1,30 @@
-## Hi there 👋
+<h1 align="center">Hi there 👋, I'm Shiiqaxmad</h1>
 
-<!--
-**shiiqaxmad/shiiqaxmad** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+<p align="center">
+  💻 Web Developer | 🌱 Learning & Growing | 🚀 Future Software Engineer
+</p>
 
-Here are some ideas to get you started:
+---
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+### 👨‍💻 About Me
+- 🔭 I’m currently working on improving my coding skills  
+- 🌱 I’m learning JavaScript and modern web technologies  
+- 🎯 Goal: Become a professional developer  
+- 📫 How to reach me: your@email.com  
+
+---
+
+### 🛠️ Skills
+- 💻 HTML, CSS  
+- ⚡ JavaScript  
+- 🧰 Git & GitHub  
+
+---
+
+### 📊 GitHub Stats
+<p align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=shiiqaxmad&show_icons=true&theme=tokyonight" />
+</p>
+
+---
+![Developer](https://images.unsplash.com/photo-1518770660439-4636190af475)
