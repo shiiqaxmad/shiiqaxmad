@@ -1,5 +1,19 @@
-    const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
+        require('dotenv').config();
+
+const {
+  default: makeWASocket,
+  useMultiFileAuthState,
+  DisconnectReason,
+  fetchLatestBaileysVersion,
+  downloadMediaMessage
+} = require('@whiskeysockets/baileys');
+
 const P = require('pino');
+const fs = require('fs');
+
+const prefix = '.';
+const owner = process.env.OWNER + '@s.whatsapp.net';
+const phoneNumber = process.env.NUMBER;
 
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState('./session');
@@ -11,132 +25,219 @@ async function startBot() {
     auth: state
   });
 
-  // 💾 Save session
   sock.ev.on('creds.update', saveCreds);
 
-  // 🔑 PAIRING CODE LOGIN
+  // Pairing
   if (!sock.authState.creds.registered) {
-    const phoneNumber = '252615810513'; // 🔁 bedel number-kaaga
     const code = await sock.requestPairingCode(phoneNumber);
     console.log('📲 Pairing Code:', code);
   }
 
-  // 🔄 CONNECTION
+  // Connection
   sock.ev.on('connection.update', (update) => {
     const { connection, lastDisconnect } = update;
 
     if (connection === 'close') {
-      const shouldReconnect = (lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut;
+      const shouldReconnect =
+        (lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut;
       if (shouldReconnect) startBot();
     } else if (connection === 'open') {
-      console.log('✅ Bot-ku wuu xirmay (Connected)');
+      console.log('✅ Bot Connected');
     }
   });
 
-  // 💬 MESSAGES
+  // Messages
   sock.ev.on('messages.upsert', async ({ messages }) => {
-    const msg = messages[0];
-    if (!msg.message) return;
+    try {
+      const msg = messages[0];
+      if (!msg.message) return;
 
-    const from = msg.key.remoteJid;
-    const isGroup = from.endsWith('@g.us');
-    const sender = msg.key.participant || from;
+      await sock.readMessages([msg.key]);
 
-    const body =
-      msg.message.conversation ||
-      msg.message.extendedTextMessage?.text ||
-      '';
+      const from = msg.key.remoteJid;
+      const isGroup = from.endsWith('@g.us');
+      const sender = msg.key.participant || from;
 
-    const command = body.toLowerCase();
+      const body =
+        msg.message.conversation ||
+        msg.message.extendedTextMessage?.text ||
+        '';
 
-    const owner = '252615810513@s.whatsapp.net';
+      const text = body.toLowerCase();
 
-    const isBotCalled = command.startsWith('shiiq bot');
-    const args = command.replace('shiiq bot', '').trim();
-
-    if (!isBotCalled) return;
-
-    // 👑 OWNER
-    if (args === '.owner') {
-      if (sender !== owner)
-        return sock.sendMessage(from, { text: '❌ Owner kaliya!' });
-
-      return sock.sendMessage(from, {
-        text: '👑 Owner command waa shaqeynayaa'
-      });
-    }
-
-    // 📜 MENU
-    if (args === '.menu') {
-      return sock.sendMessage(from, {
-        text: `🇸🇴 *Bot Menu*
-
-.menu - Liiska amarada
-.kick - Ka saar qof (admin)
-.promote - Admin ka dhig
-.demote - Ka qaad admin
-.voice - Cod tijaabo ah`
-      });
-    }
-
-    // 🔊 VOICE
-    if (args === '.voice') {
-      return sock.sendMessage(from, {
-        audio: { url: 'https://files.catbox.moe/5x6l6v.mp3' },
-        mimetype: 'audio/mp4',
-        ptt: true
-      });
-    }
-
-    // 👥 GROUP COMMANDS
-    if (isGroup) {
-      const metadata = await sock.groupMetadata(from);
-      const admins = metadata.participants
-        .filter(p => p.admin !== null)
-        .map(p => p.id);
-
-      const isAdmin = admins.includes(sender);
-
-      // ❌ KICK
-      if (args.startsWith('.kick')) {
-        if (!isAdmin)
-          return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
-
-        const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
-        if (!mentioned)
-          return sock.sendMessage(from, { text: 'Qof mention garee' });
-
-        return sock.groupParticipantsUpdate(from, mentioned, 'remove');
+      // =========================
+      // 🤖 AUTO REPLY (SHIIQ BOT)
+      // =========================
+      if (text === 'shiiq bot') {
+        return sock.sendMessage(from, {
+          text: 'Haa dheh 👀 maxaan kuu qabtaa?'
+        });
       }
 
-      // ⬆️ PROMOTE
-      if (args.startsWith('.promote')) {
-        if (!isAdmin)
-          return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
-
-        const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
-        return sock.groupParticipantsUpdate(from, mentioned, 'promote');
+      // =========================
+      // 👑 CREATOR QUESTION
+      // =========================
+      if (
+        text.includes('yaa ku sameeyay shiiq bot') ||
+        text.includes('yaa sameeyay shiiq bot')
+      ) {
+        return sock.sendMessage(from, {
+          text: '🤖 Shiiq Bot waxaa sameeyay: Sheikh Axmed 🇸🇴'
+        });
       }
 
-      // ⬇️ DEMOTE
-      if (args.startsWith('.demote')) {
-        if (!isAdmin)
-          return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
+      // =========================
+      // 🎧 SAVE VOICE
+      // =========================
+      if (msg.message.audioMessage) {
+        const buffer = await downloadMediaMessage(msg, 'buffer', {});
+        fs.writeFileSync('./voice.ogg', buffer);
 
-        const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
-        return sock.groupParticipantsUpdate(from, mentioned, 'demote');
+        return sock.sendMessage(from, {
+          text: '🎧 Codka waa la keydiyay!'
+        });
       }
-    }
 
-    // 🤖 CREATOR
-    if (
-      args.includes('yaa ku sameeyay') ||
-      args.includes('yaa sameeyay') ||
-      args.includes('who made you')
-    ) {
-      return sock.sendMessage(from, {
-        text: 'Bot-kan waxaa sameeyay: Sheikh Axmed 🏴 +252615810513'
-      });
+      // =========================
+      // COMMAND SYSTEM
+      // =========================
+      if (!body.startsWith(prefix)) return;
+
+      const args = body.slice(prefix.length).trim().split(' ');
+      const cmd = args.shift().toLowerCase();
+
+      // GROUP INFO
+      let isAdmin = false;
+      let isBotAdmin = false;
+
+      if (isGroup) {
+        const metadata = await sock.groupMetadata(from);
+        const admins = metadata.participants
+          .filter(p => p.admin !== null)
+          .map(p => p.id);
+
+        isAdmin = admins.includes(sender);
+        isBotAdmin = admins.includes(sock.user.id);
+      }
+
+      // =========================
+      // 📜 MENU
+      // =========================
+      if (cmd === 'menu') {
+        return sock.sendMessage(from, {
+          text: `🤖 *SHIIQ BOT FULL*
+
+.menu
+.ping
+.say
+.voice
+.kick
+.promote
+.demote
+.tagall
+.creator`
+        });
+      }
+
+      // PING
+      if (cmd === 'ping') {
+        return sock.sendMessage(from, { text: '🏓 Pong!' });
+      }
+
+      // 🎤 TEXT → VOICE
+      if (cmd === 'say') {
+        const text = args.join(' ');
+        if (!text) return sock.sendMessage(from, { text: 'Qor wax la akhriyo' });
+
+        const url = `https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=${encodeURIComponent(text)}`;
+
+        return sock.sendMessage(from, {
+          audio: { url },
+          mimetype: 'audio/mp4',
+          ptt: true
+        });
+      }
+
+      // VOICE TEST
+      if (cmd === 'voice') {
+        return sock.sendMessage(from, {
+          audio: { url: 'https://files.catbox.moe/5x6l6v.mp3' },
+          mimetype: 'audio/mp4',
+          ptt: true
+        });
+      }
+
+      // OWNER
+      if (cmd === 'owner') {
+        if (sender !== owner)
+          return sock.sendMessage(from, { text: '❌ Owner kaliya!' });
+
+        return sock.sendMessage(from, { text: '👑 Owner waa sax!' });
+      }
+
+      // =========================
+      // 👥 GROUP COMMANDS
+      // =========================
+      if (isGroup) {
+
+        // KICK
+        if (cmd === 'kick') {
+          if (!isAdmin) return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
+          if (!isBotAdmin) return sock.sendMessage(from, { text: '❌ Bot admin ma aha!' });
+
+          const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
+          if (!mentioned) return sock.sendMessage(from, { text: 'Mention qof' });
+
+          return sock.groupParticipantsUpdate(from, mentioned, 'remove');
+        }
+
+        // PROMOTE
+        if (cmd === 'promote') {
+          if (!isAdmin) return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
+          if (!isBotAdmin) return sock.sendMessage(from, { text: '❌ Bot admin ma aha!' });
+
+          const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
+          return sock.groupParticipantsUpdate(from, mentioned, 'promote');
+        }
+
+        // DEMOTE
+        if (cmd === 'demote') {
+          if (!isAdmin) return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
+          if (!isBotAdmin) return sock.sendMessage(from, { text: '❌ Bot admin ma aha!' });
+
+          const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
+          return sock.groupParticipantsUpdate(from, mentioned, 'demote');
+        }
+
+        // TAG ALL
+        if (cmd === 'tagall') {
+          if (!isAdmin) return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
+
+          const metadata = await sock.groupMetadata(from);
+          const participants = metadata.participants;
+
+          let text = '📢 Tag All\n\n';
+
+          for (let p of participants) {
+            text += `@${p.id.split('@')[0]}\n`;
+          }
+
+          return sock.sendMessage(from, {
+            text,
+            mentions: participants.map(p => p.id)
+          });
+        }
+      }
+
+      // CREATOR COMMAND
+      if (cmd === 'creator') {
+        return sock.sendMessage(from, {
+          text: '👨‍💻 Sheikh Axmed 🇸🇴'
+        });
+      }
+
+    } catch (err) {
+      console.log('❌ Error:', err);
     }
   });
 }
