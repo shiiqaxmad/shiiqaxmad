@@ -1,78 +1,168 @@
-# This workflow will build and push a node.js application to an Azure Web App when a commit is pushed to your default branch.
-#
-# This workflow assumes you have already created the target Azure App Service web app.
-# For instructions see https://docs.microsoft.com/en-us/azure/app-service/quickstart-nodejs?tabs=linux&pivots=development-environment-cli
-#
-# To configure this workflow:
-#
-# 1. Download the Publish Profile for your Azure Web App. You can download this file from the Overview page of your Web App in the Azure Portal.
-#    For more information: https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#generate-deployment-credentials
-#
-# 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE, paste the publish profile contents as the value of the secret.
-#    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
-#
-# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the AZURE_WEBAPP_PACKAGE_PATH and NODE_VERSION environment variables below.
-#
-# For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
-# For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
+ const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require("@adiwajshing/baileys");
+const P = require("pino");
+const fs = require("fs");
+const gtts = require("gtts");
 
-on:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
+async function startBot() {
+  const { state, saveCreds } = await useMultiFileAuthState("auth");
 
-env:
-  AZURE_WEBAPP_NAME: your-app-name    # set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
-  NODE_VERSION: '20.x'                # set this to the node version to use
+  const sock = makeWASocket({
+    logger: P({ level: "silent" }),
+    auth: state,
+    printQRInTerminal: true
+  });
 
-permissions:
-  contents: read
+  sock.ev.on("creds.update", saveCreds);
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
+  sock.ev.on("messages.upsert", async ({ messages }) => {
+    const msg = messages[0];
+    if (!msg.message) return;
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
+    const from = msg.key.remoteJid;
+    const isGroup = from.endsWith("@g.us");
 
-    - name: npm install, build, and test
-      run: |
-        npm install
-        npm run build --if-present
-        npm run test --if-present
+    const text =
+      msg.message.conversation ||
+      msg.message.extendedTextMessage?.text ||
+      "";
 
-    - name: Upload artifact for deployment job
-      uses: actions/upload-artifact@v4
-      with:
-        name: node-app
-        path: .
+    const body = text.toLowerCase();
 
-  deploy:
-    permissions:
-      contents: none
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Development'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    // 🔊 cod function
+    const sendVoice = async (textMsg) => {
+      const file = "./voice.mp3";
+      const gTTS = new gtts(textMsg, "en");
 
-    steps:
-    - name: Download artifact from build job
-      uses: actions/download-artifact@v4
-      with:
-        name: node-app
+      gTTS.save(file, async () => {
+        await sock.sendMessage(from, {
+          audio: fs.readFileSync(file),
+          mimetype: "audio/mp4",
+          ptt: true
+        });
+        fs.unlinkSync(file);
+      });
+    };
 
-    - name: 'Deploy to Azure WebApp'
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    // 🤖 yaa ku sameeyay
+    if (body.includes("yaa ku sameeyay") || body.includes("yaaku sameeyay")) {
+      const reply = "Waxaa i sameeyay Sheikh Axmad Al Shabaab";
+
+      await sock.sendMessage(from, {
+        text: "🤖 " + reply + " 🇸🇴"
+      });
+
+      await sendVoice(reply);
+    }
+
+    const prefix = ".";
+    if (!text.startsWith(prefix)) return;
+
+    const args = text.slice(1).trim().split(" ");
+    const cmd = args.shift().toLowerCase();
+
+    // 👑 owner
+    if (cmd === "owner") {
+      const reply = "Waxaa i sameeyay Sheikh Axmad Al Shabaab";
+
+      await sock.sendMessage(from, { text: "🤖 " + reply });
+      await sendVoice(reply);
+    }
+
+    // 📢 tagall
+    if (cmd === "tagall" && isGroup) {
+      const metadata = await sock.groupMetadata(from);
+      const participants = metadata.participants;
+
+      let teks = "📢 Dhamaan dadka group-ka:\n\n";
+      let mentions = [];
+
+      for (let p of participants) {
+        teks += `@${p.id.split("@")[0]}\n`;
+        mentions.push(p.id);
+      }
+
+      await sock.sendMessage(from, {
+        text: teks,
+        mentions: mentions
+      });
+    }
+
+    // 🚫 kick
+    if (cmd === "kick" && isGroup) {
+      const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
+      if (!mentioned) return;
+
+      await sock.groupParticipantsUpdate(from, mentioned, "remove");
+
+      await sock.sendMessage(from, {
+        text: "❌ Qofka waa laga saaray group-ka"
+      });
+    }
+
+    // ➕ add
+    if (cmd === "add" && isGroup) {
+      const number = args[0];
+      if (!number) return;
+
+      const jid = number + "@s.whatsapp.net";
+
+      await sock.groupParticipantsUpdate(from, [jid], "add");
+
+      await sock.sendMessage(from, {
+        text: "✅ Qof cusub waa lagu daray group-ka"
+      });
+    }
+
+    // 🤖 AI + cod
+    if (cmd === "ai") {
+      const sual = args.join(" ");
+
+      if (!sual) {
+        return sock.sendMessage(from, {
+          text: "❓ Su'aal ii qor"
+        });
+      }
+
+      let jawaab = "Waan ku fahmay 👍";
+
+      if (sual.includes("iska waran")) jawaab = "Waan fiicanahay adiga";
+      if (sual.includes("magacaa")) jawaab = "Magaceygu waa Shiiq Axmad";
+      if (sual.includes("yaa ku sameeyay")) jawaab = "Waxaa i sameeyay Sheikh Axmad Al Shabaab";
+
+      await sock.sendMessage(from, { text: "🤖 " + jawaab });
+      await sendVoice(jawaab);
+    }
+
+    // 🛑 spam control
+    if (cmd === "spam") {
+      const option = args[0];
+
+      if (option === "on") {
+        await sock.sendMessage(from, {
+          text: "🚫 Spam waa la xakameeyay"
+        });
+      } else if (option === "off") {
+        await sock.sendMessage(from, {
+          text: "✅ Spam waa la fasaxay"
+        });
+      }
+    }
+  });
+
+  sock.ev.on("connection.update", (update) => {
+    const { connection, lastDisconnect } = update;
+
+    if (connection === "close") {
+      const shouldReconnect =
+        lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
+
+      if (shouldReconnect) {
+        startBot();
+      }
+    } else if (connection === "open") {
+      console.log("✅ Shiiq Axmad Bot waa online!");
+    }
+  });
+}
+
+startBot();        
