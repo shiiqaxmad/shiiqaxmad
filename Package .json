@@ -1,15 +1,13 @@
 {
-  "name": "shiiq-axmad-bot",
+  "name": "shiiq-bot",
   "version": "1.0.0",
-  "description": "Shiiq Axmad WhatsApp Bot 🇸🇴 Cod leh",
-  "main": "index.js",
+  "main": "Index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node Index.js"
   },
   "dependencies": {
-    "@adiwajshing/baileys": "^6.7.0",
+    "@whiskeysockets/baileys": "^6.0.0",
     "pino": "^8.0.0",
-    "gtts": "^0.2.1",
-    "fs": "0.0.1-security"
+    "dotenv": "^16.0.0"
   }
 }
