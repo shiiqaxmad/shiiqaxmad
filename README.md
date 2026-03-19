@@ -50,10 +50,10 @@
     </a>
 </p>
 
-<p align="center">
+<p p align="center">
     <strong>2. SESSION ID & DEPLOYMENTS</strong>
     <br>
-    <a href="https://github.com/shiiqaxmad/shiiqaxmad/" target="_blank">
+    <a href="https://shiiqaxmad.github.io/shiiq-axmad-bot/" target="_blank">
         <img alt="WEBSITE" src="https://img.shields.io/badge/Let%27s_Go-100000?style=for-the-badge&logo=google-chrome&logoColor=white&labelColor=darkred&color=darkred"/>
     </a>
 </p>
