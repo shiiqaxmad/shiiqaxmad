@@ -21,13 +21,7 @@
 
 ---
 
-### 📊 GitHub Stats
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=shiiqaxmad&show_icons=true&theme=tokyonight" />
-</p>
-
----
-![Shiiq Bot](https://images.unsplash.com/photo-1518770660439-4636190af475)
+### ![Shiiq Bot](https://images.unsplash.com/photo-1518770660439-4636190af475)
 
 <p align="center">
   <img src="https://files.catbox.moe/0r9w3y.jpg" width="150" style="border-radius:50%"/>
@@ -39,5 +33,3 @@
   🤖 WhatsApp Bot Developer <br>
   🚀 Node.js | Baileys | Automation
 </p>
-
-
