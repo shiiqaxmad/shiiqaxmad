@@ -33,10 +33,11 @@
   <img src="https://files.catbox.moe/0r9w3y.jpg" width="150" style="border-radius:50%"/>
 </p>
 
-<h1 align="center">🤖 SHIIQ BOT</h1>
+<h1 align="center">👨‍💻 Sheikh Axmed 🇸🇴</h1>
 
 <p align="center">
-  Waxaa sameeyay Sheikh Axmed 🇸🇴
+  🤖 WhatsApp Bot Developer <br>
+  🚀 Node.js | Baileys | Automation
 </p>
 
 
