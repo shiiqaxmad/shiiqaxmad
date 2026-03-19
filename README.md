@@ -50,10 +50,10 @@
     </a>
 </p>
 
-<p p align="center">
+<p align="center">
     <strong>2. SESSION ID & DEPLOYMENTS</strong>
-    <br>
-    <a href="https://shiiqaxmad.com/shiiqaxmad/" target="_blank">
-        <img alt="WEBSITE" src="https://img.shields.io/badge/Let%27s_Go-100000?style=for-the-badge&logo=google-chrome&logoColor=white&labelColor=darkred&color=darkred"/>
+    <br><br>
+    <a href="https://github.com/shiiqaxmad/shiiqaxmad/tree/shiiqaxmad-patch-6-1" target="_blank">
+        <img alt="DEPLOY NOW" src="https://img.shields.io/badge/DEPLOY_NOW-darkred?style=for-the-badge&logo=vercel&logoColor=white"/>
     </a>
 </p>
