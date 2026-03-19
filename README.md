@@ -50,16 +50,27 @@
     </a>
 </p> 
   <p align="center">
-  <strong>2. SESSION ID & DEPLOY</strong>
+  <strong>🚀 SESSION & DEPLOY</strong>
   <br><br>
 
-  <a href="https://your-session-site.com" target="_blank">
-    <img src="https://img.shields.io/badge/GET_SESSION_ID-success?style=for-the-badge&logo=whatsapp"/>
+  <!-- SESSION ID -->
+  <a href="https://your-session-link.com">
+    <img src="https://img.shields.io/badge/SESSION_ID-green?style=for-the-badge&logo=whatsapp"/>
   </a>
 
-  <br><br>
-
-  <a href="https://railway.app/new?repo=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
-    <img src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-black?style=for-the-badge&logo=railway"/>
+  <!-- RAILWAY -->
+  <a href="https://railway.app/new/template?template=YOUR_GITHUB_LINK">
+    <img src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-purple?style=for-the-badge&logo=railway"/>
   </a>
+
+  <!-- RENDER -->
+  <a href="https://render.com/deploy">
+    <img src="https://img.shields.io/badge/DEPLOY_TO_RENDER-blue?style=for-the-badge&logo=render"/>
+  </a>
+
+  <!-- HEROKU -->
+  <a href="https://heroku.com/deploy?template=YOUR_GITHUB_LINK">
+    <img src="https://img.shields.io/badge/DEPLOY_TO_HEROKU-orange?style=for-the-badge&logo=heroku"/>
+  </a>
+
 </p>
