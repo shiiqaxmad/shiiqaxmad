@@ -27,8 +27,6 @@
 </p>
 
 ---
-<p align="center">
-  <img src="https://files.catbox.moe/0r9w3y.jpg" width="300" style="border-radius: 50%;"/>
-</p>
+<img src="https://files.catbox.moe/xxxxxx.jpg" width="300"/>
 
 
