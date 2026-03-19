@@ -55,4 +55,8 @@
     <a href="https://railway.app/new?repo=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
         <img alt="DEPLOY TO RAILWAY" src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-darkred?style=for-the-badge&logo=railway&logoColor=white"/>
     </a>
-<
+ if (!sock.authState.creds.registered) {
+  const number = "252XXXXXXXXX"; // lambarkaaga
+  const code = await sock.requestPairingCode(number);
+  console.log("PAIRING CODE:", code);
+}
