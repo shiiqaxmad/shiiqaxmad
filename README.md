@@ -55,11 +55,4 @@
     <a href="https://railway.app/new?repo=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
         <img alt="DEPLOY TO RAILWAY" src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-darkred?style=for-the-badge&logo=railway&logoColor=white"/>
     </a>
-</p>
-p align="center">
-    <strong>SESSION & DEPLOY</strong>
-    <br><br>
-
-    <a href="https://your-session-site.com">
-        <img src="https://img.shields.io/badge/PAIRING_CODE-green?style=for-the-badge&logo=whatsapp"/>
-    </a>
+<
