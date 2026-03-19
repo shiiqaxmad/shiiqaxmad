@@ -30,77 +30,59 @@
 
 ![Developer](https://images.unsplash.com/photo-1518770660439-4636190af475)
 
-
 <p align="center">
   <img src="https://files.catbox.moe/0r9w3y.jpg" width="150" style="border-radius:50%"/>
 </p>
 
 <h1 align="center">🤖 SHIIQ BOT</h1>
 
-
-  <p align="center">
-    <strong>🤖 SHIIQ AXMAD BOT</strong>
+<p align="center">
+  <strong>🤖 SHIIQ AXMAD BOT</strong>
 </p>
 
+---
+
 <p align="center">
-    <strong>1. FORK REPOSITORY</strong>
+  <strong>1. FORK REPOSITORY</strong>
   <br>
-    <a href="https://github.com/shiiqaxmad/shiiqaxmad/fork" target="_blank">
-        <img alt="Fork Repo" src="https://img.shields.io/badge/Fork%20Repo-100000?style=for-the-badge&logo=github&logoColor=white&labelColor=darkblue&color=darkblue"/>
-    </a>
-</p> 
-  <p align="center">
-  <strong>🚀 SESSION (PAIR) & DEPLOY OPTIONS</strong>
-  <br><br>
+  <a href="https://github.com/shiiqaxmad/shiiqaxmad/fork" target="_blank">
+    <img alt="Fork Repo" src="https://img.shields.io/badge/Fork%20Repo-100000?style=for-the-badge&logo=github&logoColor=white&labelColor=darkblue&color=darkblue"/>
+  </a>
+</p>
 
-  <!-- ===================== -->
-  <!-- 🔑 PAIRING CODE ONLY -->
-  <!-- ===================== -->
+---
 
-  <a href="https://your-pair-app.onrender.com/pair" target="_blank">
+<h2 align="center">🔑 GET PAIRING CODE</h2>
+
+<p align="center">
+  <a href="https://MAGAC-APP.onrender.com/pair" target="_blank">
     <img src="https://img.shields.io/badge/GET_PAIR_CODE-green?style=for-the-badge&logo=whatsapp"/>
   </a>
+</p>
 
-  <br><br>
-  <strong>⬇️ Deploy Options (Separate)</strong>
-  <br><br>
+---
 
-  <!-- ===================== -->
-  <!-- 🚀 HEROKU -->
-  <!-- ===================== -->
+<h2 align="center">🚀 DEPLOY OPTIONS</h2>
 
+<p align="center">
+
+  <!-- HEROKU -->
   <a href="https://heroku.com/deploy?template=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
     <img src="https://img.shields.io/badge/HEROKU_DEPLOY-orange?style=for-the-badge&logo=heroku"/>
   </a>
 
   <br><br>
 
-  <!-- ===================== -->
-  <!-- 🚄 RAILWAY -->
-  <!-- ===================== -->
-
+  <!-- RAILWAY -->
   <a href="https://railway.app/new/template?template=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
     <img src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-purple?style=for-the-badge&logo=railway"/>
   </a>
 
   <br><br>
 
-  <!-- ===================== -->
-  <!-- ⚡ RENDER -->
-  <!-- ===================== -->
-
-  <a href="https://render.com/deploy" target="_blank">
+  <!-- RENDER -->
+  <a href="https://render.com/deploy?repo=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
     <img src="https://img.shields.io/badge/DEPLOY_TO_RENDER-blue?style=for-the-badge&logo=render"/>
-  </a>
-
-  <br><br>
-
-  <!-- ===================== -->
-  <!-- 🧠 REPLIT -->
-  <!-- ===================== -->
-
-  <a href="https://replit.com/github/shiiqaxmad/shiiqaxmad" target="_blank">
-    <img src="https://img.shields.io/badge/RUN_ON_REPLIT-black?style=for-the-badge&logo=replit"/>
   </a>
 
 </p>
