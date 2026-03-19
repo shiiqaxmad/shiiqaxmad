@@ -54,25 +54,6 @@
   <br><br>
 
   <!-- SESSION -->
-  <a href="https://session-bot.onrender.com">
-    <img src="https://img.shields.io/badge/SESSION_ID-green?style=for-the-badge&logo=whatsapp"/>
-  </a>
-
-  <!-- RENDER -->
-  <a href="https://render.com/deploy">
-    <img src="https://img.shields.io/badge/DEPLOY_RENDER-blue?style=for-the-badge&logo=render"/>
-  </a>
-
-  <!-- HEROKU -->
-  <a href="https://heroku.com/deploy">
-    <img src="https://img.shields.io/badge/DEPLOY_HEROKU-orange?style=for-the-badge&logo=heroku"/>
-  </a>
-</p>
-<p align="center">
-  <strong>🚀 SESSION & DEPLOY</strong>
-  <br><br>
-
-  <!-- SESSION -->
   <a href="https://your-app.up.railway.app">
     <img src="https://img.shields.io/badge/SESSION_ID-green?style=for-the-badge&logo=whatsapp"/>
   </a>
