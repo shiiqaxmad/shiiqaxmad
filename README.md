@@ -50,13 +50,16 @@
     </a>
 </p> 
   <p align="center">
-    <strong>2. SESSION ID & DEPLOYMENTS</strong>
-    <br><br>
-    <a href="https://railway.app/new?repo=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
-        <img alt="DEPLOY TO RAILWAY" src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-darkred?style=for-the-badge&logo=railway&logoColor=white"/>
-    </a>
- if (!sock.authState.creds.registered) {
-  const number = "252XXXXXXXXX"; // lambarkaaga
-  const code = await sock.requestPairingCode(number);
-  console.log("PAIRING CODE:", code);
-}
+  <strong>2. SESSION ID & DEPLOY</strong>
+  <br><br>
+
+  <a href="https://your-session-site.com" target="_blank">
+    <img src="https://img.shields.io/badge/GET_SESSION_ID-success?style=for-the-badge&logo=whatsapp"/>
+  </a>
+
+  <br><br>
+
+  <a href="https://railway.app/new?repo=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
+    <img src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-black?style=for-the-badge&logo=railway"/>
+  </a>
+</p>
