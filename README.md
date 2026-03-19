@@ -49,7 +49,7 @@
         <img alt="Fork Repo" src="https://img.shields.io/badge/Fork%20Repo-100000?style=for-the-badge&logo=github&logoColor=white&labelColor=darkblue&color=darkblue"/>
     </a>
 </p> 
-        <p align="center">
+  <p align="center">
   <strong>🚀 SESSION & DEPLOY</strong>
   <br><br>
 
@@ -58,18 +58,8 @@
     <img src="https://img.shields.io/badge/GET_SESSION_CODE-green?style=for-the-badge&logo=whatsapp"/>
   </a>
 
-  <!-- RAILWAY -->
-  <a href="https://railway.app/new/template?template=YOUR_GITHUB_LINK">
-    <img src="https://img.shields.io/badge/DEPLOY_RAILWAY-purple?style=for-the-badge&logo=railway"/>
-  </a>
-
-  <!-- RENDER -->
-  <a href="https://render.com/deploy">
-    <img src="https://img.shields.io/badge/DEPLOY_RENDER-blue?style=for-the-badge&logo=render"/>
-  </a>
-
-  <!-- HEROKU -->
+  <!-- HEROKU ONLY -->
   <a href="https://heroku.com/deploy?template=YOUR_GITHUB_LINK">
     <img src="https://img.shields.io/badge/DEPLOY_HEROKU-orange?style=for-the-badge&logo=heroku"/>
   </a>
-</p> 
+</p>
