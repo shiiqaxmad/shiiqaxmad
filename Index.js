@@ -1,22 +1,27 @@
-        require('dotenv').config();
+require('dotenv').config();
 
 const {
   default: makeWASocket,
   useMultiFileAuthState,
-  DisconnectReason,
-  fetchLatestBaileysVersion,
-  downloadMediaMessage
+  fetchLatestBaileysVersion
 } = require('@whiskeysockets/baileys');
 
-const P = require('pino');
 const fs = require('fs');
+const P = require('pino');
 
-const prefix = '.';
-const owner = process.env.OWNER + '@s.whatsapp.net';
-const phoneNumber = process.env.NUMBER;
+const SUDO = process.env.OWNER + '@s.whatsapp.net';
 
-async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState('./session');
+const sessions = {};
+
+async function createSession(id, number) {
+
+  const sessionPath = `./sessions/${id}`;
+
+  if (!fs.existsSync(sessionPath)) {
+    fs.mkdirSync(sessionPath, { recursive: true });
+  }
+
+  const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
   const { version } = await fetchLatestBaileysVersion();
 
   const sock = makeWASocket({
@@ -27,219 +32,85 @@ async function startBot() {
 
   sock.ev.on('creds.update', saveCreds);
 
-  // Pairing
   if (!sock.authState.creds.registered) {
-    const code = await sock.requestPairingCode(phoneNumber);
-    console.log('📲 Pairing Code:', code);
+    const code = await sock.requestPairingCode(number);
+    console.log(`📲 Pairing for ${number}:`, code);
   }
 
-  // Connection
   sock.ev.on('connection.update', (update) => {
-    const { connection, lastDisconnect } = update;
-
-    if (connection === 'close') {
-      const shouldReconnect =
-        (lastDisconnect.error)?.output?.statusCode !== DisconnectReason.loggedOut;
-      if (shouldReconnect) startBot();
-    } else if (connection === 'open') {
-      console.log('✅ Bot Connected');
+    if (update.connection === 'open') {
+      console.log(`✅ Connected: ${number}`);
     }
   });
 
-  // Messages
+  sessions[id] = sock;
+}
+
+// MAIN CONTROL BOT
+async function startMainBot() {
+
+  const { state, saveCreds } = await useMultiFileAuthState('./main-session');
+  const { version } = await fetchLatestBaileysVersion();
+
+  const sock = makeWASocket({
+    version,
+    logger: P({ level: 'silent' }),
+    auth: state
+  });
+
+  sock.ev.on('creds.update', saveCreds);
+
+  if (!sock.authState.creds.registered) {
+    const code = await sock.requestPairingCode(process.env.NUMBER);
+    console.log("📲 MAIN BOT PAIR:", code);
+  }
+
   sock.ev.on('messages.upsert', async ({ messages }) => {
-    try {
-      const msg = messages[0];
-      if (!msg.message) return;
+    const msg = messages[0];
+    if (!msg.message) return;
 
-      await sock.readMessages([msg.key]);
+    const from = msg.key.remoteJid;
+    const sender = msg.key.participant || from;
 
-      const from = msg.key.remoteJid;
-      const isGroup = from.endsWith('@g.us');
-      const sender = msg.key.participant || from;
+    const text =
+      msg.message.conversation ||
+      msg.message.extendedTextMessage?.text ||
+      '';
 
-      const body =
-        msg.message.conversation ||
-        msg.message.extendedTextMessage?.text ||
-        '';
+    // =========================
+    // 👑 SUDO ONLY COMMAND
+    // =========================
+    if (text.startsWith('.add')) {
+      if (sender !== SUDO) return;
 
-      const text = body.toLowerCase();
-
-      // =========================
-      // 🤖 AUTO REPLY (SHIIQ BOT)
-      // =========================
-      if (text === 'shiiq bot') {
-        return sock.sendMessage(from, {
-          text: 'Haa dheh 👀 maxaan kuu qabtaa?'
-        });
+      const number = text.split(' ')[1];
+      if (!number) {
+        return sock.sendMessage(from, { text: 'Gali number' });
       }
 
-      // =========================
-      // 👑 CREATOR QUESTION
-      // =========================
-      if (
-        text.includes('yaa ku sameeyay shiiq bot') ||
-        text.includes('yaa sameeyay shiiq bot')
-      ) {
-        return sock.sendMessage(from, {
-          text: '🤖 Shiiq Bot waxaa sameeyay: Sheikh Axmed 🇸🇴'
-        });
+      await createSession(number, number);
+
+      return sock.sendMessage(from, {
+        text: `✅ Session started for ${number}`
+      });
+    }
+
+    // =========================
+    // 👤 USER PAIR COMMAND
+    // =========================
+    if (text.startsWith('.pair')) {
+      const number = text.split(' ')[1];
+      if (!number) {
+        return sock.sendMessage(from, { text: 'Isticmaal: .pair 25261xxxx' });
       }
 
-      // =========================
-      // 🎧 SAVE VOICE
-      // =========================
-      if (msg.message.audioMessage) {
-        const buffer = await downloadMediaMessage(msg, 'buffer', {});
-        fs.writeFileSync('./voice.ogg', buffer);
+      await createSession(number, number);
 
-        return sock.sendMessage(from, {
-          text: '🎧 Codka waa la keydiyay!'
-        });
-      }
-
-      // =========================
-      // COMMAND SYSTEM
-      // =========================
-      if (!body.startsWith(prefix)) return;
-
-      const args = body.slice(prefix.length).trim().split(' ');
-      const cmd = args.shift().toLowerCase();
-
-      // GROUP INFO
-      let isAdmin = false;
-      let isBotAdmin = false;
-
-      if (isGroup) {
-        const metadata = await sock.groupMetadata(from);
-        const admins = metadata.participants
-          .filter(p => p.admin !== null)
-          .map(p => p.id);
-
-        isAdmin = admins.includes(sender);
-        isBotAdmin = admins.includes(sock.user.id);
-      }
-
-      // =========================
-      // 📜 MENU
-      // =========================
-      if (cmd === 'menu') {
-        return sock.sendMessage(from, {
-          text: `🤖 *SHIIQ BOT FULL*
-
-.menu
-.ping
-.say
-.voice
-.kick
-.promote
-.demote
-.tagall
-.creator`
-        });
-      }
-
-      // PING
-      if (cmd === 'ping') {
-        return sock.sendMessage(from, { text: '🏓 Pong!' });
-      }
-
-      // 🎤 TEXT → VOICE
-      if (cmd === 'say') {
-        const text = args.join(' ');
-        if (!text) return sock.sendMessage(from, { text: 'Qor wax la akhriyo' });
-
-        const url = `https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=${encodeURIComponent(text)}`;
-
-        return sock.sendMessage(from, {
-          audio: { url },
-          mimetype: 'audio/mp4',
-          ptt: true
-        });
-      }
-
-      // VOICE TEST
-      if (cmd === 'voice') {
-        return sock.sendMessage(from, {
-          audio: { url: 'https://files.catbox.moe/5x6l6v.mp3' },
-          mimetype: 'audio/mp4',
-          ptt: true
-        });
-      }
-
-      // OWNER
-      if (cmd === 'owner') {
-        if (sender !== owner)
-          return sock.sendMessage(from, { text: '❌ Owner kaliya!' });
-
-        return sock.sendMessage(from, { text: '👑 Owner waa sax!' });
-      }
-
-      // =========================
-      // 👥 GROUP COMMANDS
-      // =========================
-      if (isGroup) {
-
-        // KICK
-        if (cmd === 'kick') {
-          if (!isAdmin) return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
-          if (!isBotAdmin) return sock.sendMessage(from, { text: '❌ Bot admin ma aha!' });
-
-          const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
-          if (!mentioned) return sock.sendMessage(from, { text: 'Mention qof' });
-
-          return sock.groupParticipantsUpdate(from, mentioned, 'remove');
-        }
-
-        // PROMOTE
-        if (cmd === 'promote') {
-          if (!isAdmin) return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
-          if (!isBotAdmin) return sock.sendMessage(from, { text: '❌ Bot admin ma aha!' });
-
-          const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
-          return sock.groupParticipantsUpdate(from, mentioned, 'promote');
-        }
-
-        // DEMOTE
-        if (cmd === 'demote') {
-          if (!isAdmin) return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
-          if (!isBotAdmin) return sock.sendMessage(from, { text: '❌ Bot admin ma aha!' });
-
-          const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
-          return sock.groupParticipantsUpdate(from, mentioned, 'demote');
-        }
-
-        // TAG ALL
-        if (cmd === 'tagall') {
-          if (!isAdmin) return sock.sendMessage(from, { text: '❌ Admin kaliya!' });
-
-          const metadata = await sock.groupMetadata(from);
-          const participants = metadata.participants;
-
-          let text = '📢 Tag All\n\n';
-
-          for (let p of participants) {
-            text += `@${p.id.split('@')[0]}\n`;
-          }
-
-          return sock.sendMessage(from, {
-            text,
-            mentions: participants.map(p => p.id)
-          });
-        }
-      }
-
-      // CREATOR COMMAND
-      if (cmd === 'creator') {
-        return sock.sendMessage(from, {
-          text: '👨‍💻 Sheikh Axmed 🇸🇴'
-        });
-      }
-
-    } catch (err) {
-      console.log('❌ Error:', err);
+      return sock.sendMessage(from, {
+        text: `📲 Pairing code console-ka ka eeg: ${number}`
+      });
     }
   });
 }
 
-startBot();
+startMainBot();
