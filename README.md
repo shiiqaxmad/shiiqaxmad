@@ -50,27 +50,27 @@
     </a>
 </p> 
   <p align="center">
-  <strong>🚀 SESSION & DEPLOY</strong>
+  <strong>🚀 SESSION & DEPLOY LINKS</strong>
   <br><br>
 
-  <!-- SESSION ID -->
-  <a href="https://your-session-link.com">
-    <img src="https://img.shields.io/badge/SESSION_ID-green?style=for-the-badge&logo=whatsapp"/>
+  <!-- SESSION LINK -->
+  <a href="https://your-app-name.up.railway.app">
+    <img src="https://img.shields.io/badge/GET_SESSION-green?style=for-the-badge&logo=whatsapp"/>
   </a>
 
-  <!-- RAILWAY -->
+  <!-- RAILWAY DEPLOY -->
   <a href="https://railway.app/new/template?template=YOUR_GITHUB_LINK">
-    <img src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-purple?style=for-the-badge&logo=railway"/>
+    <img src="https://img.shields.io/badge/DEPLOY_RAILWAY-purple?style=for-the-badge&logo=railway"/>
   </a>
 
-  <!-- RENDER -->
+  <!-- RENDER DEPLOY -->
   <a href="https://render.com/deploy">
-    <img src="https://img.shields.io/badge/DEPLOY_TO_RENDER-blue?style=for-the-badge&logo=render"/>
+    <img src="https://img.shields.io/badge/DEPLOY_RENDER-blue?style=for-the-badge&logo=render"/>
   </a>
 
-  <!-- HEROKU -->
+  <!-- HEROKU DEPLOY -->
   <a href="https://heroku.com/deploy?template=YOUR_GITHUB_LINK">
-    <img src="https://img.shields.io/badge/DEPLOY_TO_HEROKU-orange?style=for-the-badge&logo=heroku"/>
+    <img src="https://img.shields.io/badge/DEPLOY_HEROKU-orange?style=for-the-badge&logo=heroku"/>
   </a>
 
 </p>
