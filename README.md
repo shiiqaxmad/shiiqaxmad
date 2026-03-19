@@ -50,10 +50,19 @@
     </a>
 </p>
 
-p align="center">
-    <strong>2. SESSION ID & DEPLOYMENTS</strong>
-    <br>
-    <a href="https://www.cypherx.space/" target="_blank">
-        <img alt="WEBSITE" src="https://img.shields.io/badge/Let%27s_Go-100000?style=for-the-badge&logo=scan&logoColor=white&labelColor=darkred&color=darkred"/>
+<p align="center">
+    <strong>2. SESSION & DEPLOYMENT</strong>
+    <br><br>
+
+    <!-- SESSION BUTTON -->
+    <a href="https://github.com/shiiqaxmad/shiiqaxmad/tree/shiiqaxmad-patch-6-1" target="_blank">
+        <img alt="SESSION" src="https://img.shields.io/badge/SESSION_ID-CLICK_HERE-100000?style=for-the-badge&logo=key&logoColor=white&labelColor=blue&color=blue"/>
+    </a>
+
+    <br><br>
+
+    <!-- DEPLOYMENT BUTTON -->
+    <a href="https://github.com/shiiqaxmad/shiiqaxmad/tree/shiiqaxmad-patch-6-1" target="_blank">
+        <img alt="DEPLOY" src="https://img.shields.io/badge/DEPLOY_NOW-CLICK_HERE-100000?style=for-the-badge&logo=rocket&logoColor=white&labelColor=darkgreen&color=darkgreen"/>
     </a>
 </p>
