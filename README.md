@@ -50,18 +50,57 @@
     </a>
 </p> 
   <p align="center">
-  <strong>🚀 SESSION & DEPLOY</strong>
+  <strong>🚀 SESSION (PAIR) & DEPLOY OPTIONS</strong>
   <br><br>
 
-  <!-- GET PAIR CODE -->
-  <a href="https://YOUR-APP.herokuapp.com/pair" target="_blank">
+  <!-- ===================== -->
+  <!-- 🔑 PAIRING CODE ONLY -->
+  <!-- ===================== -->
+
+  <a href="https://your-pair-app.onrender.com/pair" target="_blank">
     <img src="https://img.shields.io/badge/GET_PAIR_CODE-green?style=for-the-badge&logo=whatsapp"/>
   </a>
 
   <br><br>
+  <strong>⬇️ Deploy Options (Separate)</strong>
+  <br><br>
 
-  <!-- HEROKU -->
+  <!-- ===================== -->
+  <!-- 🚀 HEROKU -->
+  <!-- ===================== -->
+
   <a href="https://heroku.com/deploy?template=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
-    <img src="https://img.shields.io/badge/DEPLOY_TO_HEROKU-orange?style=for-the-badge&logo=heroku"/>
+    <img src="https://img.shields.io/badge/HEROKU_DEPLOY-orange?style=for-the-badge&logo=heroku"/>
   </a>
+
+  <br><br>
+
+  <!-- ===================== -->
+  <!-- 🚄 RAILWAY -->
+  <!-- ===================== -->
+
+  <a href="https://railway.app/new/template?template=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
+    <img src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-purple?style=for-the-badge&logo=railway"/>
+  </a>
+
+  <br><br>
+
+  <!-- ===================== -->
+  <!-- ⚡ RENDER -->
+  <!-- ===================== -->
+
+  <a href="https://render.com/deploy" target="_blank">
+    <img src="https://img.shields.io/badge/DEPLOY_TO_RENDER-blue?style=for-the-badge&logo=render"/>
+  </a>
+
+  <br><br>
+
+  <!-- ===================== -->
+  <!-- 🧠 REPLIT -->
+  <!-- ===================== -->
+
+  <a href="https://replit.com/github/shiiqaxmad/shiiqaxmad" target="_blank">
+    <img src="https://img.shields.io/badge/RUN_ON_REPLIT-black?style=for-the-badge&logo=replit"/>
+  </a>
+
 </p>
