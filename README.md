@@ -54,12 +54,12 @@
   <br><br>
 
   <!-- SESSION -->
-  <a href="https://YOUR-APP.up.railway.app/pair">
+  <a href="https://shiiq-bot.herokuapp.com/pair">
     <img src="https://img.shields.io/badge/GET_SESSION_CODE-green?style=for-the-badge&logo=whatsapp"/>
   </a>
 
   <!-- HEROKU ONLY -->
-  <a href="https://heroku.com/deploy?template=YOUR_GITHUB_LINK">
+  <a href="https://heroku.com/deploy?template=https://github.com/shiiqaxmad/shiiqaxmad">
     <img src="https://img.shields.io/badge/DEPLOY_HEROKU-orange?style=for-the-badge&logo=heroku"/>
   </a>
 </p>
