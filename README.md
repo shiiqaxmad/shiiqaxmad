@@ -37,7 +37,7 @@
 
 <h1 align="center">🤖 SHIIQ BOT</h1>
 
-p align="center">
+
     <strong>1. FORK REPOSITORY</strong>
   <br>
     <a href="https://github.com/shiiqaxmad/shiiqaxmadfork" target="_blank">
