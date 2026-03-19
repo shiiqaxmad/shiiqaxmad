@@ -51,7 +51,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/shiiqaxmad/shiiqaxmad/tree/shiiqaxmad-patch-6-1">
+  <a href="https://www.cypherx.space/">
     <img src="https://img.shields.io/badge/SESSION_&_DEPLOY-CLICK_HERE-darkred?style=for-the-badge&logo=github&logoColor=white"/>
   </a>
 </p>
