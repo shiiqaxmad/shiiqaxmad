@@ -53,13 +53,15 @@
   <strong>🚀 SESSION & DEPLOY</strong>
   <br><br>
 
-  <!-- SESSION -->
-  <a href="https://shiiq-bot.herokuapp.com/pair">
-    <img src="https://img.shields.io/badge/GET_SESSION_CODE-green?style=for-the-badge&logo=whatsapp"/>
+  <!-- GET PAIR CODE -->
+  <a href="https://YOUR-APP.herokuapp.com/pair" target="_blank">
+    <img src="https://img.shields.io/badge/GET_PAIR_CODE-green?style=for-the-badge&logo=whatsapp"/>
   </a>
 
-  <!-- HEROKU ONLY -->
-  <a href="https://heroku.com/deploy?template=https://github.com/shiiqaxmad/shiiqaxmad">
-    <img src="https://img.shields.io/badge/DEPLOY_HEROKU-orange?style=for-the-badge&logo=heroku"/>
+  <br><br>
+
+  <!-- HEROKU -->
+  <a href="https://heroku.com/deploy?template=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
+    <img src="https://img.shields.io/badge/DEPLOY_TO_HEROKU-orange?style=for-the-badge&logo=heroku"/>
   </a>
 </p>
