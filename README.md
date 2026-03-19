@@ -29,7 +29,7 @@
 ---
 
 ![Developer](https://images.unsplash.com/photo-1518770660439-4636190af475)
-![Shiiq Bot](https://images.unsplash.com/photo-1518770660439-4636190af475)
+
 
 <p align="center">
   <img src="https://files.catbox.moe/0r9w3y.jpg" width="150" style="border-radius:50%"/>
