@@ -53,24 +53,18 @@
   <strong>🚀 SESSION & DEPLOY</strong>
   <br><br>
 
-  <!-- SESSION ID -->
-  <a href="https://YOUR-APP-LINK.com">
+  <!-- SESSION -->
+  <a href="https://session-bot.onrender.com">
     <img src="https://img.shields.io/badge/SESSION_ID-green?style=for-the-badge&logo=whatsapp"/>
-  </a>
-
-  <!-- RAILWAY -->
-  <a href="https://railway.app/new/template?template=YOUR_GITHUB_LINK">
-    <img src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-purple?style=for-the-badge&logo=railway"/>
   </a>
 
   <!-- RENDER -->
   <a href="https://render.com/deploy">
-    <img src="https://img.shields.io/badge/DEPLOY_TO_RENDER-blue?style=for-the-badge&logo=render"/>
+    <img src="https://img.shields.io/badge/DEPLOY_RENDER-blue?style=for-the-badge&logo=render"/>
   </a>
 
   <!-- HEROKU -->
-  <a href="https://heroku.com/deploy?template=YOUR_GITHUB_LINK">
-    <img src="https://img.shields.io/badge/DEPLOY_TO_HEROKU-orange?style=for-the-badge&logo=heroku"/>
+  <a href="https://heroku.com/deploy">
+    <img src="https://img.shields.io/badge/DEPLOY_HEROKU-orange?style=for-the-badge&logo=heroku"/>
   </a>
-
 </p>
