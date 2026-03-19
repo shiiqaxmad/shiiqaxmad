@@ -45,7 +45,7 @@
 <p align="center">
     <strong>1. FORK REPOSITORY</strong>
   <br>
-    <a href="https://github.com/shiiqaxmad/shiiqaxmad-bot/fork" target="_blank">
+    <a href="https://github.com/shiiqaxmad/shiiqaxmad/fork" target="_blank">
         <img alt="Fork Repo" src="https://img.shields.io/badge/Fork%20Repo-100000?style=for-the-badge&logo=github&logoColor=white&labelColor=darkblue&color=darkblue"/>
     </a>
 </p>
