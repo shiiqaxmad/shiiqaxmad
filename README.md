@@ -51,18 +51,7 @@
 </p>
 
 <p align="center">
-    <strong>2. SESSION & DEPLOYMENT</strong>
-    <br><br>
-
-    <!-- SESSION BUTTON -->
-    <a href="https://github.com/shiiqaxmad/shiiqaxmad/tree/shiiqaxmad-patch-6-1" target="_blank">
-        <img alt="SESSION" src="https://img.shields.io/badge/SESSION_ID-CLICK_HERE-100000?style=for-the-badge&logo=key&logoColor=white&labelColor=blue&color=blue"/>
-    </a>
-
-    <br><br>
-
-    <!-- DEPLOYMENT BUTTON -->
-    <a href="https://github.com/shiiqaxmad/shiiqaxmad/tree/shiiqaxmad-patch-6-1" target="_blank">
-        <img alt="DEPLOY" src="https://img.shields.io/badge/DEPLOY_NOW-CLICK_HERE-100000?style=for-the-badge&logo=rocket&logoColor=white&labelColor=darkgreen&color=darkgreen"/>
-    </a>
+  <a href="https://github.com/shiiqaxmad/shiiqaxmad/tree/shiiqaxmad-patch-6-1">
+    <img src="https://img.shields.io/badge/SESSION_&_DEPLOY-CLICK_HERE-darkred?style=for-the-badge&logo=github&logoColor=white"/>
+  </a>
 </p>
