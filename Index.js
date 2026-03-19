@@ -1,39 +1,3 @@
-require('dotenv').config();
-
-const {
-  default: makeWASocket,
-  useMultiFileAuthState,
-  fetchLatestBaileysVersion
-} = require('@whiskeysockets/baileys');
-
-const fs = require('fs');
-const P = require('pino');
-
-const SUDO = process.env.OWNER + '@s.whatsapp.net';
-
-const sessions = {};
-
-async function createSession(id, number) {
-
-  const sessionPath = `./sessions/${id}`;
-
-  if (!fs.existsSync(sessionPath)) {
-    fs.mkdirSync(sessionPath, { recursive: true });
-  }
-
-  const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
-  const { version } = await fetchLatestBaileysVersion();
-
-  const sock = makeWASocket({
-    version,
-    logger: P({ level: 'silent' }),
-    auth: state
-  });
-
-  sock.ev.on('creds.update', saveCreds);
-
-  if (!sock.authState.creds.registered) {
-    const code = await sock.requestPairingCode(number);
     console.log(`📲 Pairing for ${number}:`, code);
   }
 
@@ -43,26 +7,37 @@ async function createSession(id, number) {
     }
   });
 
-  sessions[id] = sock;
-}
+  require('dotenv').config();
 
-// MAIN CONTROL BOT
-async function startMainBot() {
+const {
+  default: makeWASocket,
+  useMultiFileAuthState,
+  fetchLatestBaileysVersion,
+  Browsers
+} = require('@whiskeysockets/baileys');
 
-  const { state, saveCreds } = await useMultiFileAuthState('./main-session');
+const fs = require('fs');
+const P = require('pino');
+
+const SUDO = process.env.OWNER + '@s.whatsapp.net';
+
+async function startBot() {
+
+  const { state, saveCreds } = await useMultiFileAuthState('./session');
   const { version } = await fetchLatestBaileysVersion();
 
   const sock = makeWASocket({
     version,
     logger: P({ level: 'silent' }),
-    auth: state
+    auth: state,
+    browser: Browsers.macOS("shiiq hacker")
   });
 
   sock.ev.on('creds.update', saveCreds);
 
   if (!sock.authState.creds.registered) {
     const code = await sock.requestPairingCode(process.env.NUMBER);
-    console.log("📲 MAIN BOT PAIR:", code);
+    console.log("📲 PAIR:", code);
   }
 
   sock.ev.on('messages.upsert', async ({ messages }) => {
@@ -77,40 +52,69 @@ async function startMainBot() {
       msg.message.extendedTextMessage?.text ||
       '';
 
-    // =========================
-    // 👑 SUDO ONLY COMMAND
-    // =========================
-    if (text.startsWith('.add')) {
-      if (sender !== SUDO) return;
+    const lower = text.toLowerCase();
 
-      const number = text.split(' ')[1];
-      if (!number) {
-        return sock.sendMessage(from, { text: 'Gali number' });
-      }
+    // 🔕 Kaliya shaqee marka "shiiq bot" la dhaho
+    if (!lower.includes('shiiq bot')) return;
 
-      await createSession(number, number);
+    // ✂️ command-ka ka saar "shiiq bot"
+    const command = lower.replace('shiiq bot', '').trim();
 
+    // ================= REPLY =================
+    if (command === 'hello' || command === 'hi') {
       return sock.sendMessage(from, {
-        text: `✅ Session started for ${number}`
+        text: '👋 Salaam, waa shiiq hacker bot'
       });
     }
 
-    // =========================
-    // 👤 USER PAIR COMMAND
-    // =========================
-    if (text.startsWith('.pair')) {
-      const number = text.split(' ')[1];
-      if (!number) {
-        return sock.sendMessage(from, { text: 'Isticmaal: .pair 25261xxxx' });
-      }
-
-      await createSession(number, number);
-
+    if (command.includes('yaa ku sameeyay')) {
       return sock.sendMessage(from, {
-        text: `📲 Pairing code console-ka ka eeg: ${number}`
+        text: '🤖 Waxaa sameeyay Sheikh Axmad'
       });
     }
+
+    // ================= VOICE =================
+    if (command === 'cod' || command === 'voice') {
+      return sock.sendMessage(from, {
+        audio: { url: 'https://files.catbox.moe/8q3z8o.mp3' },
+        mimetype: 'audio/mp4',
+        ptt: true
+      });
+    }
+
+    // ================= GROUP =================
+    if (from.endsWith('@g.us')) {
+
+      // 🔒 XIR GROUP
+      if (command === 'groupka xir') {
+        if (sender !== SUDO) {
+          return sock.sendMessage(from, { text: '❌ Adiga ma tihid owner' });
+        }
+
+        await sock.groupSettingUpdate(from, 'announcement');
+        return sock.sendMessage(from, { text: '🔒 Group waa la xiray' });
+      }
+
+      // 🔓 FUR GROUP
+      if (command === 'groupka fur') {
+        if (sender !== SUDO) {
+          return sock.sendMessage(from, { text: '❌ Adiga ma tihid owner' });
+        }
+
+        await sock.groupSettingUpdate(from, 'not_announcement');
+        return sock.sendMessage(from, { text: '🔓 Group waa la furay' });
+      }
+
+      // 🚫 ANTI LINK
+      if (lower.includes('chat.whatsapp.com')) {
+        if (sender !== SUDO) {
+          await sock.sendMessage(from, { text: '🚫 Link lama ogola' });
+          await sock.groupParticipantsUpdate(from, [sender], 'remove');
+        }
+      }
+    }
+
   });
 }
 
-startMainBot();
+startBot();
