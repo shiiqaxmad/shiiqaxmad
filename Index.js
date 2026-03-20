@@ -3,7 +3,8 @@ const {
   default: makeWASocket,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
-  Browsers
+  Browsers,
+  DisconnectReason
 } = require("@whiskeysockets/baileys");
 
 const P = require("pino");
@@ -61,10 +62,23 @@ async function startBot(number, res) {
     }
   }
 
-  // 🔌 CONNECTION
+  // 🔌 CONNECTION UPDATE (AUTO RECONNECT)
   sock.ev.on("connection.update", (update) => {
-    if (update.connection === "open") {
+    const { connection, lastDisconnect } = update;
+
+    if (connection === "open") {
       console.log("✅ BOT CONNECTED");
+    }
+
+    if (connection === "close") {
+      const reason = lastDisconnect?.error?.output?.statusCode;
+
+      if (reason !== DisconnectReason.loggedOut) {
+        console.log("🔄 Reconnecting...");
+        startBot(number); // restart
+      } else {
+        console.log("❌ Logged out. Scan again.");
+      }
     }
   });
 
@@ -74,7 +88,6 @@ async function startBot(number, res) {
     if (!msg.message) return;
 
     const from = msg.key.remoteJid;
-    const sender = msg.key.participant || from;
 
     const text =
       msg.message.conversation ||
@@ -83,7 +96,6 @@ async function startBot(number, res) {
 
     const body = text.toLowerCase();
 
-    // ❗ magaca bot-ka
     if (!body.startsWith("shiiq")) return;
 
     const cmd = body.replace("shiiq", "").trim();
@@ -161,7 +173,7 @@ shiiq open
     if (action === "add") {
       const number = args[1];
       if (!number)
-        return sock.sendMessage(from, { text: "❌ Number geli" });
+        return sock.sendMessage(from, { text: "❌ Number geli");
 
       const jid = number + "@s.whatsapp.net";
       await sock.groupParticipantsUpdate(from, [jid], "add");
@@ -192,7 +204,7 @@ shiiq open
       return sock.sendMessage(from, { text: "🔓 Group opened" });
     }
 
-    // 🤖 SMART (example)
+    // 🤖 SMART
     if (cmd.includes("left")) {
       return sock.sendMessage(from, { text: "⬅️ Left la qaaday" });
     }
@@ -206,6 +218,8 @@ shiiq open
 // 📲 HANDLE PAIR
 app.post("/pair", async (req, res) => {
   const number = req.body.number;
+  if (!number) return res.send("❌ Number geli");
+
   await startBot(number, res);
 });
 
