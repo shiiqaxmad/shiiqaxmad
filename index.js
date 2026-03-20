@@ -1,4 +1,4 @@
-const express = require("express");
+      const express = require("express");
 const {
   default: makeWASocket,
   useMultiFileAuthState,
@@ -15,10 +15,14 @@ const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 
 let sock;
+let isStarted = false;
 
 // 🌐 HOME
 app.get("/", (req, res) => {
-  res.send(`<h2>✅ Shiiq Bot is Running</h2><a href="/pair">PAIR NOW</a>`);
+  res.send(`
+    <h2>✅ Shiiq Bot is Running</h2>
+    <a href="/pair">📲 PAIR NOW</a>
+  `);
 });
 
 // 📲 PAIR PAGE
@@ -33,86 +37,101 @@ app.get("/pair", (req, res) => {
   `);
 });
 
-// 🚀 START BOT
-async function startBot(number, res) {
-  try {
-    const { state, saveCreds } = await useMultiFileAuthState("./session");
-    const { version } = await fetchLatestBaileysVersion();
+// 🚀 START BOT (HAL MAR OO KALIYA)
+async function startBot() {
+  if (isStarted) return;
+  isStarted = true;
 
-    sock = makeWASocket({
-      version,
-      logger: P({ level: "silent" }),
-      auth: state,
-      browser: Browsers.macOS("Shiiq Bot")
-    });
+  const { state, saveCreds } = await useMultiFileAuthState("./session");
+  const { version } = await fetchLatestBaileysVersion();
 
-    sock.ev.on("creds.update", saveCreds);
+  sock = makeWASocket({
+    version,
+    logger: P({ level: "silent" }),
+    auth: state,
+    browser: Browsers.macOS("Shiiq Bot")
+  });
 
-    // 📲 PAIR CODE
-    if (!sock.authState.creds.registered && number) {
-      try {
-        const code = await sock.requestPairingCode(number);
+  sock.ev.on("creds.update", saveCreds);
 
-        console.log("📲 PAIR CODE:", code);
+  sock.ev.on("connection.update", (update) => {
+    const { connection, lastDisconnect } = update;
 
-        return res.send(`
-          <h2>✅ Pairing Code:</h2>
-          <h1>${code}</h1>
-          <p>Tag WhatsApp → Linked Devices → Link with code</p>
-        `);
-      } catch (err) {
-        console.log("❌ Pairing error:", err);
-        return res.send("❌ Failed to generate code, try again!");
-      }
+    if (connection === "open") {
+      console.log("✅ BOT CONNECTED");
     }
 
-    // 🔌 CONNECTION UPDATE
-    sock.ev.on("connection.update", (update) => {
-      const { connection, lastDisconnect } = update;
+    if (connection === "close") {
+      const reason = lastDisconnect?.error?.output?.statusCode;
 
-      if (connection === "open") {
-        console.log("✅ BOT CONNECTED");
+      if (reason !== DisconnectReason.loggedOut) {
+        console.log("🔄 Reconnecting...");
+        isStarted = false;
+        startBot();
+      } else {
+        console.log("❌ Logged out.");
       }
+    }
+  });
 
-      if (connection === "close") {
-        const reason = lastDisconnect?.error?.output?.statusCode;
+  // 💬 BOT COMMANDS
+  sock.ev.on("messages.upsert", async ({ messages }) => {
+    const msg = messages[0];
+    if (!msg.message) return;
 
-        if (reason !== DisconnectReason.loggedOut) {
-          console.log("🔄 Reconnecting...");
-          startBot();
-        } else {
-          console.log("❌ Logged out.");
-        }
-      }
-    });
+    const from = msg.key.remoteJid;
 
-    // 💬 BOT LOGIC
-    sock.ev.on("messages.upsert", async ({ messages }) => {
-      const msg = messages[0];
-      if (!msg.message) return;
+    const text =
+      msg.message.conversation ||
+      msg.message.extendedTextMessage?.text ||
+      "";
 
-      const from = msg.key.remoteJid;
+    const body = text.toLowerCase();
 
-      const text =
-        msg.message.conversation ||
-        msg.message.extendedTextMessage?.text ||
-        "";
+    if (!body.startsWith("shiiq")) return;
 
-      const body = text.toLowerCase();
+    const cmd = body.replace("shiiq", "").trim();
 
-      if (!body.startsWith("shiiq")) return;
+    // 📜 MENU
+    if (cmd === "menu") {
+      return sock.sendMessage(from, {
+        text: `
+📜 *SHIIQ BOT MENU*
 
-      const cmd = body.replace("shiiq", "").trim();
+👋 shiiq hi
+⚡ shiiq ping
+⏰ shiiq time
+👑 shiiq owner
+ℹ️ shiiq help
+        `
+      });
+    }
 
-      if (cmd === "hi") {
-        return sock.sendMessage(from, { text: "👋 Salaam!" });
-      }
-    });
+    if (cmd === "hi") {
+      return sock.sendMessage(from, { text: "👋 Salaam!" });
+    }
 
-  } catch (err) {
-    console.log("❌ Bot start error:", err);
-    return res.send("❌ Server error, try again!");
-  }
+    if (cmd === "ping") {
+      return sock.sendMessage(from, { text: "⚡ Bot is alive!" });
+    }
+
+    if (cmd === "time") {
+      const time = new Date().toLocaleString();
+      return sock.sendMessage(from, { text: `⏰ ${time}` });
+    }
+
+    if (cmd === "owner") {
+      return sock.sendMessage(from, {
+        text: "👑 Owner: Shiiqaxmad"
+      });
+    }
+
+    if (cmd === "help") {
+      return sock.sendMessage(from, {
+        text: "ℹ️ Isticmaal 'shiiq menu' si aad u aragto commands"
+      });
+    }
+  });
 }
 
 // 📲 HANDLE PAIR
@@ -120,7 +139,22 @@ app.post("/pair", async (req, res) => {
   const number = req.body.number;
   if (!number) return res.send("❌ Number geli");
 
-  await startBot(number, res);
+  if (!sock) {
+    await startBot();
+  }
+
+  try {
+    const code = await sock.requestPairingCode(number);
+
+    res.send(`
+      <h2>✅ Pairing Code:</h2>
+      <h1>${code}</h1>
+      <p>Tag WhatsApp → Linked Devices → Link with phone number</p>
+    `);
+  } catch (err) {
+    console.log(err);
+    res.send("❌ Failed to generate code, try again!");
+  }
 });
 
 // 🚀 START SERVER
