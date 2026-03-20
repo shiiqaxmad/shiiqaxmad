@@ -34,6 +34,8 @@
   <img src="https://files.catbox.moe/0r9w3y.jpg" width="150" style="border-radius:50%"/>
 </p>
 
+---
+
 <h1 align="center">🤖 SHIIQ BOT</h1>
 
 <p align="center">
@@ -55,7 +57,7 @@
 <h2 align="center">🔑 GET PAIRING CODE</h2>
 
 <p align="center">
-  <a href="https://onrender.com/pair" target="_blank">
+  <a href="https://YOUR-APP-NAME.onrender.com/pair" target="_blank">
     <img src="https://img.shields.io/badge/GET_PAIR_CODE-green?style=for-the-badge&logo=whatsapp"/>
   </a>
 </p>
