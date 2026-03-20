@@ -55,7 +55,7 @@
 <h2 align="center">🔑 GET PAIRING CODE</h2>
 
 <p align="center">
-  <a href="https://MAGAC-APP.onrender.com/pair" target="_blank">
+  <a href="https://onrender.com/pair" target="_blank">
     <img src="https://img.shields.io/badge/GET_PAIR_CODE-green?style=for-the-badge&logo=whatsapp"/>
   </a>
 </p>
