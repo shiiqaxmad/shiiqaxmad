@@ -2,17 +2,164 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PAIR CODE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pair WhatsApp</title>
+
+  <style>
+    * {
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: Arial;
+    }
+
+    body {
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: linear-gradient(135deg,#141e30,#243b55);
+      color:white;
+    }
+
+    .card {
+      background: rgba(0,0,0,0.7);
+      padding:40px;
+      border-radius:20px;
+      width:350px;
+      text-align:center;
+      backdrop-filter: blur(10px);
+      box-shadow:0 0 25px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      margin-bottom:10px;
+    }
+
+    p {
+      font-size:14px;
+      color:#bbb;
+      margin-bottom:20px;
+    }
+
+    input {
+      width:100%;
+      padding:12px;
+      border-radius:12px;
+      border:none;
+      margin-bottom:15px;
+      text-align:center;
+    }
+
+    button {
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:12px;
+      background:#00ffcc;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+    button:disabled {
+      background:gray;
+    }
+
+    .qr {
+      margin-top:15px;
+      display:block;
+      color:#00ffcc;
+      text-decoration:none;
+    }
+
+    .steps {
+      margin-top:20px;
+      text-align:left;
+      font-size:13px;
+      color:#aaa;
+    }
+
+    .lang {
+      position:absolute;
+      top:20px;
+      right:20px;
+      cursor:pointer;
+      font-size:13px;
+      color:#00ffcc;
+    }
+
+    .loader {
+      display:none;
+      margin-top:10px;
+    }
+  </style>
 </head>
-<body style="text-align:center; font-family:Arial; margin-top:50px;">
 
-  <h2>📲 WhatsApp Pairing</h2>
+<body>
 
-  <form method="POST" action="/pair">
-    <input type="text" name="number" placeholder="25261xxxxxxx" required />
-    <br><br>
-    <button type="submit">GET CODE</button>
+<div class="lang" onclick="toggleLang()">🌐 EN / SO</div>
+
+<div class="card">
+  <h1 id="title">📲 Pair WhatsApp</h1>
+  <p id="desc">Enter your number to connect bot</p>
+
+  <form id="form" method="POST" action="/pair">
+    <input id="number" name="number" placeholder="25261xxxxxxx" required>
+    <button id="btn" type="submit">GET CODE</button>
   </form>
+
+  <div class="loader" id="loader">⏳ Generating code...</div>
+
+  <a href="/qr" class="qr">📷 Scan QR Instead</a>
+
+  <ul class="steps" id="steps">
+    <li>1. Enter number (252...)</li>
+    <li>2. Click GET CODE</li>
+    <li>3. Open WhatsApp</li>
+    <li>4. Linked Devices</li>
+    <li>5. Link with phone number</li>
+  </ul>
+</div>
+
+<script>
+let isEnglish = true;
+
+function toggleLang() {
+  isEnglish = !isEnglish;
+
+  document.getElementById("title").innerText = isEnglish ? "📲 Pair WhatsApp" : "📲 Ku Xir WhatsApp";
+  document.getElementById("desc").innerText = isEnglish ? "Enter your number to connect bot" : "Geli number-kaaga si aad bot-ka ugu xirto";
+  document.getElementById("btn").innerText = isEnglish ? "GET CODE" : "HEL CODE";
+  
+  document.getElementById("steps").innerHTML = isEnglish ? `
+    <li>1. Enter number (252...)</li>
+    <li>2. Click GET CODE</li>
+    <li>3. Open WhatsApp</li>
+    <li>4. Linked Devices</li>
+    <li>5. Link with phone number</li>
+  ` : `
+    <li>1. Geli number (252...)</li>
+    <li>2. Riix HEL CODE</li>
+    <li>3. Fur WhatsApp</li>
+    <li>4. Linked Devices</li>
+    <li>5. Link with phone number</li>
+  `;
+}
+
+// VALIDATION + LOADING
+document.getElementById("form").addEventListener("submit", function(e) {
+  const number = document.getElementById("number").value;
+
+  if (!number.startsWith("252") || number.length < 12) {
+    alert("❌ Number sax geli (252...)");
+    e.preventDefault();
+    return;
+  }
+
+  document.getElementById("btn").disabled = true;
+  document.getElementById("loader").style.display = "block";
+});
+</script>
 
 </body>
 </html>
