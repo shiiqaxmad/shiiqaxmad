@@ -20,35 +20,79 @@ let sock;
 let isStarted = false;
 let qrImage = null;
 
-// 🌐 HOME
+// 🌐 HOME (PRO DESIGN)
 app.get("/", (req, res) => {
   res.send(`
+  <!DOCTYPE html>
   <html>
-  <body style="background:linear-gradient(135deg,#141e30,#243b55);color:white;text-align:center;padding-top:150px;font-family:Arial;">
-    <h1>🤖 SHIIQ BOT PRO</h1>
-    <p>Ultimate Version 🚀</p>
+  <head>
+    <title>Shiiq Bot</title>
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+      body{
+        height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        background:linear-gradient(135deg,#141e30,#243b55);
+        color:white;
+      }
+      .container{
+        width:100%;
+        max-width:500px;
+        padding:30px;
+        text-align:center;
+      }
+      h1{font-size:32px;margin-bottom:10px}
+      p{color:#bbb;margin-bottom:30px}
+      .btn{
+        display:block;
+        width:100%;
+        padding:15px;
+        margin:10px 0;
+        border-radius:12px;
+        text-decoration:none;
+        font-weight:bold;
+        background:#00ffcc;
+        color:black;
+      }
+      .btn:hover{background:#00cc99}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🤖 SHIIQ BOT PRO</h1>
+      <p>Ultimate Version 🚀</p>
 
-    <a href="/pair" style="padding:12px 25px;background:#00ffcc;color:black;border-radius:10px;">📲 Pair</a>
-    <br><br>
-    <a href="/qr" style="padding:12px 25px;background:#00ffcc;color:black;border-radius:10px;">📷 QR</a>
+      <a href="/pair" class="btn">📲 Pairing Code</a>
+      <a href="/qr" class="btn">📷 Scan QR Code</a>
+    </div>
   </body>
   </html>
   `);
 });
 
-// 📲 PAIR PAGE
+// 📲 PAIR PAGE (PRO DESIGN)
 app.get("/pair", (req, res) => {
   res.send(`
+  <!DOCTYPE html>
   <html>
-  <body style="background:#111;color:white;text-align:center;padding-top:100px;">
-    <h2>📲 Pair WhatsApp</h2>
-    <form method="POST" action="/pair">
-      <input name="number" placeholder="25261xxxxxxx" required style="padding:10px;border-radius:10px;">
-      <br><br>
-      <button style="padding:10px 20px;background:#00ffcc;border:none;border-radius:10px;">GET CODE</button>
-    </form>
-    <br>
-    <a href="/qr">📷 Use QR</a>
+  <body style="background:#111;color:white;display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial;">
+    <div style="width:100%;max-width:400px;text-align:center;">
+      <h2>📲 Pair WhatsApp</h2>
+
+      <form method="POST" action="/pair">
+        <input name="number" placeholder="25261xxxxxxx" required 
+        style="width:100%;padding:12px;border-radius:10px;text-align:center;border:none;margin-top:15px;">
+        
+        <button style="width:100%;margin-top:15px;padding:12px;background:#00ffcc;border:none;border-radius:10px;">
+          GET CODE
+        </button>
+      </form>
+
+      <br>
+      <a href="/qr" style="color:#00ffcc;">📷 Use QR Instead</a>
+    </div>
   </body>
   </html>
   `);
@@ -74,33 +118,24 @@ async function startBot() {
   sock.ev.on("connection.update", async (update) => {
     const { connection, qr, lastDisconnect } = update;
 
-    if (qr) {
-      qrImage = await QRCode.toDataURL(qr);
-    }
+    if (qr) qrImage = await QRCode.toDataURL(qr);
 
-    if (connection === "open") {
-      console.log("✅ CONNECTED");
-    }
+    if (connection === "open") console.log("✅ CONNECTED");
 
     if (connection === "close") {
-      const reason = lastDisconnect?.error?.output?.statusCode;
-
-      if (reason !== DisconnectReason.loggedOut) {
-        console.log("🔄 Reconnecting...");
+      if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
         isStarted = false;
         startBot();
       }
     }
   });
 
-  // 🤖 BOT LOGIC (UNCHANGED)
+  // 🤖 BOT LOGIC
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
 
     const from = msg.key.remoteJid;
-    const isGroup = from.endsWith("@g.us");
-
     const text =
       msg.message.conversation ||
       msg.message.extendedTextMessage?.text ||
@@ -108,82 +143,25 @@ async function startBot() {
 
     const body = text.toLowerCase();
 
-    if (!body.startsWith("shiiq")) {
-      if (body.includes("sidee tahay"))
-        return sock.sendMessage(from, { text: "Waan fiicanahay 😎 adigana?" });
-
-      if (body.includes("yaa ku sameeyay"))
-        return sock.sendMessage(from, { text: "🤖 Waxaa i sameeyay Shiiqaxmad" });
-
-      return;
-    }
+    if (!body.startsWith("shiiq")) return;
 
     const cmd = body.replace("shiiq", "").trim();
 
     if (cmd === "menu") {
       return sock.sendMessage(from, {
-        text: `
-🤖 *SHIIQ ULTIMATE BOT*
+        text: `🤖 SHIIQ BOT
 
 👋 hi
 ⚡ ping
 ⏰ time
-👑 owner
-😂 joke
-📊 status
-
-👮 kick
-🔇 mute
-🔊 unmute
-
-🎬 tiktok
-🎧 song
-🤖 ai
-        `
+👑 owner`
       });
     }
 
     if (cmd === "hi") return sock.sendMessage(from, { text: "👋 Salaam!" });
-    if (cmd === "ping") return sock.sendMessage(from, { text: "⚡ Speed OK!" });
+    if (cmd === "ping") return sock.sendMessage(from, { text: "⚡ Alive!" });
     if (cmd === "time") return sock.sendMessage(from, { text: new Date().toLocaleString() });
     if (cmd === "owner") return sock.sendMessage(from, { text: "👑 Shiiqaxmad" });
-
-    if (cmd === "joke") {
-      return sock.sendMessage(from, {
-        text: "😂 Bot ayaa yiri: 'Internet iga jooji markaan xanaaqo!'"
-      });
-    }
-
-    if (cmd === "status") {
-      return sock.sendMessage(from, { text: "📊 ONLINE 24/7 🚀" });
-    }
-
-    if (isGroup && cmd === "kick") {
-      const user = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
-      if (!user) return sock.sendMessage(from, { text: "Tag user!" });
-
-      await sock.groupParticipantsUpdate(from, user, "remove");
-    }
-
-    if (cmd === "mute") return sock.sendMessage(from, { text: "🔇 Group muted (demo)" });
-    if (cmd === "unmute") return sock.sendMessage(from, { text: "🔊 Group unmuted (demo)" });
-
-    if (cmd.startsWith("tiktok")) {
-      return sock.sendMessage(from, { text: "🎬 TikTok download (ku xiro API)" });
-    }
-
-    if (cmd.startsWith("song")) {
-      return sock.sendMessage(from, { text: "🎧 Song download (ku xiro API)" });
-    }
-
-    if (cmd.startsWith("ai")) {
-      const q = cmd.replace("ai", "").trim();
-      if (!q) return sock.sendMessage(from, { text: "Qor su’aal 😄" });
-
-      return sock.sendMessage(from, {
-        text: `🤖 Jawaab: "${q}" waa su’aal fiican! 😎`
-      });
-    }
   });
 }
 
@@ -202,17 +180,7 @@ app.post("/pair", async (req, res) => {
   try {
     if (!sock) {
       await startBot();
-
-      // 🔥 FIX: hal mar oo clean ah
-      await new Promise(resolve => {
-        const listener = (u) => {
-          if (u.connection === "open") {
-            sock.ev.off("connection.update", listener);
-            resolve();
-          }
-        };
-        sock.ev.on("connection.update", listener);
-      });
+      await new Promise(r => setTimeout(r, 8000));
     }
 
     const code = await sock.requestPairingCode(number);
@@ -227,12 +195,11 @@ app.post("/pair", async (req, res) => {
     `);
 
   } catch (err) {
-    console.log(err);
-    res.send("❌ Failed");
+    res.send("❌ Failed, try again!");
   }
 });
 
-// 📷 QR (FIXED UX)
+// 📷 QR PAGE
 app.get("/qr", async (req, res) => {
   if (!sock) {
     await startBot();
@@ -240,14 +207,7 @@ app.get("/qr", async (req, res) => {
   }
 
   if (!qrImage) {
-    return res.send(`
-    <html>
-    <body style="background:black;color:white;text-align:center;padding-top:100px;">
-      <h2>⏳ Generating QR...</h2>
-      <p>Refresh after 5 seconds</p>
-    </body>
-    </html>
-    `);
+    return res.send("⏳ Refresh...");
   }
 
   res.send(`
@@ -262,5 +222,5 @@ app.get("/qr", async (req, res) => {
 
 // 🚀 SERVER
 app.listen(PORT, () => {
-  console.log("🚀 Ultimate Bot Running");
+  console.log("🚀 SHIIQ BOT RUNNING");
 });
