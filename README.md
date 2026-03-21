@@ -1,90 +1,32 @@
-<h1 align="center">Hi there 👋, I'm Shiiqaxmad</h1>
+<h1 align="center">⚡ SHIIQAXMAD ⚡</h1><p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?color=00FF00&center=true&vCenter=true&width=500&lines=HACKER+MODE+ACTIVATED;WHATSAPP+BOT+DEVELOPER;ANTI+BAN+SYSTEM;ULTRA+PAIRING+ENGINE" />
+</p><p align="center">
+  <img src="https://i.imgur.com/Zb8YQWQ.jpeg" width="400"/>
+</p><p align="center">
+  <img src="https://img.shields.io/badge/STATUS-ACTIVE-00ff00?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/MODE-HACKER-black?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/SYSTEM-ONLINE-green?style=for-the-badge"/>
+</p>---
 
-<p align="center">
-  💻 Web Developer | 🌱 Learning & Growing | 🚀 Future Software Engineer
-</p>
-
----
-
-### 👨‍💻 About Me
-- 🔭 I’m currently working on improving my coding skills  
-- 🌱 I’m learning JavaScript and modern web technologies  
-- 🎯 Goal: Become a professional developer  
-- 📫 How to reach me: your@email.com  
-
----
-
-### 🛠️ Skills
-- 💻 HTML, CSS  
-- ⚡ JavaScript  
-- 🧰 Git & GitHub  
-
----
-
-### 📊 GitHub Stats
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=shiiqaxmad&show_icons=true&theme=tokyonight" />
-</p>
-
----
-
-![Shiiqaxmad](https://images.unsplash.com/photo-1518770660439-4636190af475)
-
-<p align="center">
-  <img src="https://files.catbox.moe/0r9w3y.jpg" width="150" style="border-radius:50%"/>
-</p>
-
----
-
-<h1 align="center">🤖 SHIIQ BOT</h1>
-
-<p align="center">
-  <strong>🤖 SHIIQ AXMAD BOT</strong>
-</p>
-
----
-
-<p align="center">
-  <strong>1. FORK REPOSITORY</strong>
-  <br>
-  <a href="https://github.com/shiiqaxmad/shiiqaxmad/fork" target="_blank">
-    <img alt="Fork Repo" src="https://img.shields.io/badge/Fork%20Repo-100000?style=for-the-badge&logo=github&logoColor=white&labelColor=darkblue&color=darkblue"/>
+<h2 align="center">⚡ ACCESS ⚡</h2><p align="center">
+  <a href="https://shiiqaxmad.onrender.com/pair">
+    <img src="https://img.shields.io/badge/⚡ GET_PAIR_CODE-000000?style=for-the-badge&logo=whatsapp"/>
+  </a>  <a href="https://shiiqaxmad.onrender.com/qr">
+    <img src="https://img.shields.io/badge/📷 SCAN_QR-000000?style=for-the-badge&logo=whatsapp"/>
   </a>
-</p>
+</p>---
+
+<h2 align="center">🧠 SYSTEM TERMINAL</h2>> Initializing SHIIQ CORE...
+
+[✔] AntiBan System .......... ENABLED
+[✔] Pairing Engine ......... ULTRA FAST
+[✔] Connection ............. STABLE
+[✔] Security Layer ......... ACTIVE
+
+> STATUS: RUNNING 24/7 🚀
 
 ---
 
-<h2 align="center">🔑 GET PAIRING CODE</h2>
-
 <p align="center">
-  <a href="https://shiiqaxmad.onrender.com/pair" target="_blank">
-    <img src="https://img.shields.io/badge/GET_PAIR_CODE-green?style=for-the-badge&logo=whatsapp"/>
-  </a>
-</p>
-
----
-
-<h2 align="center">🚀 DEPLOY OPTIONS</h2>
-
-<p align="center">
-
-  <!-- HEROKU -->
-  <a href="https://heroku.com/deploy?template=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
-    <img src="https://img.shields.io/badge/HEROKU_DEPLOY-orange?style=for-the-badge&logo=heroku"/>
-  </a>
-
-  <br><br>
-
-  <!-- RAILWAY -->
-  <a href="https://railway.app/new/template?template=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
-    <img src="https://img.shields.io/badge/DEPLOY_TO_RAILWAY-purple?style=for-the-badge&logo=railway"/>
-  </a>
-
-  <br><br>
-
-  <!-- RENDER -->
-  <a href="https://render.com/deploy?repo=https://github.com/shiiqaxmad/shiiqaxmad" target="_blank">
-    <img src="https://img.shields.io/badge/DEPLOY_TO_RENDER-blue?style=for-the-badge&logo=render"/>
-  </a>
-
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:000000,100:00ff00&height=120&section=footer"/>
 </p>
