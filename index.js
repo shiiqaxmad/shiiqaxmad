@@ -25,10 +25,10 @@ process.on("unhandledRejection", console.error);
 
 // 🌐 HOME
 app.get("/", (req, res) => {
-  res.send("🤖 SHIIQ BOT ACTIVE 24/7 ✅");
+  res.send("🤖 SHIIQ BOT PRO MAX ACTIVE 24/7 ✅");
 });
 
-// 🚀 START BOT (ULTRA STABLE)
+// 🚀 START BOT (ANTI BAN + SMART)
 async function startBot() {
   if (isStarted) return;
   isStarted = true;
@@ -40,7 +40,7 @@ async function startBot() {
     version,
     logger: P({ level: "silent" }),
     auth: state,
-    browser: Browsers.macOS("Shiiq Ultimate")
+    browser: Browsers.macOS("Shiiq AntiBan")
   });
 
   sock.ev.on("creds.update", saveCreds);
@@ -59,18 +59,25 @@ async function startBot() {
     }
 
     if (connection === "close") {
-      const shouldReconnect =
-        lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+      const code = lastDisconnect?.error?.output?.statusCode;
 
-      if (shouldReconnect) {
-        console.log("🔄 RECONNECTING...");
+      if (code !== DisconnectReason.loggedOut) {
+        console.log("🔄 SMART RECONNECT...");
         isStarted = false;
-        setTimeout(() => startBot(), 3000);
+
+        // 🧠 anti-ban delay (random)
+        const delay = Math.floor(Math.random() * 5000) + 3000;
+
+        setTimeout(() => {
+          if (!isStarted) startBot();
+        }, delay);
+      } else {
+        console.log("❌ Logged out - scan again");
       }
     }
   });
 
-  // 🤖 SIMPLE BOT
+  // 🤖 BOT (ANTI BAN RESPONSE DELAY)
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
@@ -81,13 +88,16 @@ async function startBot() {
       msg.message.extendedTextMessage?.text ||
       "";
 
+    // 🧠 delay si ban looga fogaado
+    await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
+
     if (text.toLowerCase() === "hi") {
       await sock.sendMessage(from, { text: "👋 Salaam!" });
     }
   });
 }
 
-// ⚡ ULTRA PAIR
+// ⚡ SMART PAIR (ANTI BAN + RETRY)
 app.all("/pair", async (req, res) => {
   let code = "";
   let number = req.body?.number;
@@ -99,34 +109,35 @@ app.all("/pair", async (req, res) => {
       code = "❌ Format: 25261xxxxxxx";
     } else {
       try {
-        if (!sock) {
-          await startBot();
-        }
+        if (!sock) await startBot();
 
+        // 🧠 sug bot ready
         let attempts = 0;
-        while (!sock?.user && attempts < 10) {
+        while (!sock?.user && attempts < 15) {
           await new Promise(r => setTimeout(r, 1000));
           attempts++;
         }
 
         if (!sock?.user) {
-          code = "⏳ Bot starting... refresh kadib";
+          code = "⏳ Bot starting... refresh";
         } else {
           let success = false;
           let tries = 0;
 
-          while (!success && tries < 3) {
+          while (!success && tries < 4) {
             try {
               code = await sock.requestPairingCode(number);
               success = true;
             } catch {
               tries++;
-              await new Promise(r => setTimeout(r, 1500));
+
+              // 🧠 anti-ban delay
+              await new Promise(r => setTimeout(r, 2000 + Math.random() * 2000));
             }
           }
 
           if (!success) {
-            code = "❌ Failed, sug 20s kadib isku day";
+            code = "❌ Try again after 30s";
           }
         }
 
@@ -140,7 +151,7 @@ app.all("/pair", async (req, res) => {
   res.send(`
   <html>
   <body style="background:#111;color:white;text-align:center;padding-top:100px;font-family:Arial;">
-    <h2>⚡ SHIIQ ULTRA PAIR</h2>
+    <h2>⚡ SHIIQ PRO MAX PAIR</h2>
 
     <form method="POST">
       <input name="number" placeholder="25261xxxxxxx" required
@@ -161,18 +172,18 @@ app.all("/pair", async (req, res) => {
   `);
 });
 
-// 📷 QR (STABLE)
+// 📷 QR (SMART WAIT)
 app.get("/qr", async (req, res) => {
   if (!sock) await startBot();
 
   let attempts = 0;
 
-  while (!qrImage && attempts < 15) {
+  while (!qrImage && attempts < 20) {
     await new Promise(r => setTimeout(r, 1000));
     attempts++;
   }
 
-  if (!qrImage) return res.send("❌ QR not ready, refresh");
+  if (!qrImage) return res.send("❌ QR not ready");
 
   res.send(`
   <html>
@@ -184,7 +195,10 @@ app.get("/qr", async (req, res) => {
   `);
 });
 
-// 🚀 SERVER
-app.listen(PORT, () => {
-  console.log("🚀 SHIIQ BOT RUNNING");
+// 🚀 SERVER + AUTO START
+app.listen(PORT, async () => {
+  console.log("🚀 SHIIQ BOT PRO MAX RUNNING");
+
+  // 🔥 AUTO START
+  await startBot();
 });
