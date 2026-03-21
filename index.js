@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
 
 // ✅ STATUS
 app.get("/status", (req, res) => {
-  if (sock?.user) {
+  if (sock && sock.user) {
     res.send("✅ READY");
   } else {
     res.send("⏳ NOT READY");
@@ -69,23 +69,26 @@ async function startBot() {
 
     if (qr) {
       qrImage = await QRCode.toDataURL(qr);
+      console.log("QR READY");
     }
 
     if (connection === "open") {
+      console.log("CONNECTED ✅");
       qrImage = null;
-      console.log("CONNECTED");
     }
 
     if (connection === "close") {
       const code = lastDisconnect?.error?.output?.statusCode;
+      console.log("DISCONNECTED:", code);
+
       if (code !== DisconnectReason.loggedOut) {
         isStarted = false;
-        setTimeout(() => startBot(), 4000);
+        setTimeout(() => startBot(), 5000);
       }
     }
   });
 
-  // 🤖 COMMANDS (ONLY WHEN "shiiq bot" LA SHEEGO)
+  // 🤖 COMMANDS (MA TAABAN)
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
@@ -98,33 +101,22 @@ async function startBot() {
 
     const t = text.toLowerCase();
 
-    // ❗ magaca waa in la sheego
     if (!t.includes("shiiq bot")) return;
 
     await new Promise(r => setTimeout(r, 700));
 
-    // 👑 owner
     if (t.includes("yaa sameeyay") || t.includes("owner")) {
-      return sock.sendMessage(from, {
-        text: "👑 Sheikh Axmad"
-      });
+      return sock.sendMessage(from, { text: "👑 Sheikh Axmad" });
     }
 
-    // ❤️ madaxey gangs
     if (t.includes("madaxey gangs mataqaan")) {
-      return sock.sendMessage(from, {
-        text: "❤️ Waa jacaylka Shiiq Axmad"
-      });
+      return sock.sendMessage(from, { text: "❤️ Waa jacaylka Shiiq Axmad" });
     }
 
-    // 😂 salaam
     if (t.includes("salaamay") || t.includes("hi")) {
-      return sock.sendMessage(from, {
-        text: "👋 Wcs bro"
-      });
+      return sock.sendMessage(from, { text: "👋 Wcs bro" });
     }
 
-    // 😎 default reply
     return sock.sendMessage(from, {
       text: "😎 Haa waa aniga Shiiq Bot"
     });
@@ -143,22 +135,21 @@ app.all("/pair", async (req, res) => {
       try {
         if (!sock) await startBot();
 
-        let ready = false;
-        for (let i = 0; i < 25; i++) {
-          if (sock?.user) {
-            ready = true;
-            break;
-          }
+        // sug ilaa bot diyaar noqdo
+        let attempts = 0;
+        while (!sock?.user && attempts < 20) {
           await new Promise(r => setTimeout(r, 1000));
+          attempts++;
         }
 
-        if (!ready) {
-          code = "⏳ Sug yar...";
+        if (!sock?.user) {
+          code = "⏳ Bot not ready, try again";
         } else {
           code = await sock.requestPairingCode(number);
         }
 
-      } catch {
+      } catch (err) {
+        console.log(err);
         code = "❌ Failed";
       }
     } else {
@@ -193,7 +184,7 @@ app.get("/qr", async (req, res) => {
     attempts++;
   }
 
-  if (!qrImage) return res.send("❌");
+  if (!qrImage) return res.send("❌ QR not ready");
 
   res.send(`<img src="${qrImage}" width="250"/>`);
 });
