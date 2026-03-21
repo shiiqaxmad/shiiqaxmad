@@ -1,71 +1,60 @@
-<h1 align="center">👨‍💻 SHIIQAXMAD</h1>
+<<h1 align="center">Hi there 👋, I'm Shiiqaxmad</h1>
 
 <p align="center">
-🚀 Elite Developer • 🤖 Bot Engineer • 💻 Tech Leader
+  💻 Web Developer | 🌱 Learning & Growing | 🚀 Future Software Engineer
 </p>
 
 ---
 
+### 👨‍💻 About Me
+- 🔭 I’m currently working on improving my coding skills  
+- 🌱 I’m learning JavaScript and modern web technologies  
+- 🎯 Goal: Become a professional developer  
+- 📫 How to reach me: your@email.com  
+
+---
+
+### 🛠️ Skills
+- 💻 HTML, CSS  
+- ⚡ JavaScript  
+- 🧰 Git & GitHub  
+
+---
+
+### 📊 GitHub Stats
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?color=00FFCC&center=true&vCenter=true&lines=SHIIQ+BOT+PRO;FAST+%2B+SECURE+%2B+SMART;PAIR+AND+DEPLOY+EASILY" />
+  <img src="https://github-readme-stats.vercel.app/api?username=shiiqaxmad&show_icons=true&theme=tokyonight" />
 </p>
 
 ---
 
-<!-- 🔥 FORK -->
-<p align="center">
-  <strong>🍴 FORK REPOSITORY</strong>
-  <br><br>
+![Developer](https://images.unsplash.com/photo-1518770660439-4636190af475)
 
-  <a href="https://github.com/shiiqaxmad/shiiq-bot/fork">
-    <img src="https://img.shields.io/badge/🔥_FORK_NOW-000000?style=for-the-badge&logo=github&logoColor=00ffcc&labelColor=000000"/>
-  </a>
-</p>
-
----
-
-<!-- 📲 PAIR -->
-<p align="center">
-  <strong>📲 PAIRING SYSTEM</strong>
-  <br><br>
-
-  <a href="https://shiiqaxmad.onrender.com/pair">
-    <img src="https://img.shields.io/badge/⚡_PAIR_CODE-000000?style=for-the-badge&logo=whatsapp&logoColor=00ffcc"/>
-  </a>
-
-  &nbsp;&nbsp;&nbsp;
-
-  <a href="https://shiiqaxmad.onrender.com/qr">
-    <img src="https://img.shields.io/badge/📷_QR_CODE-000000?style=for-the-badge&logo=whatsapp&logoColor=00ffcc"/>
-  </a>
-</p>
-
----
-
-<!-- 🚀 DEPLOY -->
-<p align="center">
-  <strong>🚀 DEPLOYMENTS</strong>
-  <br><br>
-
-  <a href="https://replit.com/new/nodejs">
-    <img src="https://img.shields.io/badge/⚡_REPLIT-000000?style=for-the-badge&logo=replit&logoColor=00ffcc"/>
-  </a>
-
-  &nbsp;&nbsp;
-
-  <a href="https://render.com/deploy?repo=https://github.com/shiiqaxmad/shiiq-bot">
-    <img src="https://img.shields.io/badge/🚀_RENDER-000000?style=for-the-badge&logo=render&logoColor=00ffcc"/>
-  </a>
-
-  &nbsp;&nbsp;
-
-  <a href="https://railway.app/new/template?template=https://github.com/shiiqaxmad/shiiq-bot">
-    <img src="https://img.shields.io/badge/🚆_RAILWAY-000000?style=for-the-badge&logo=railway&logoColor=00ffcc"/>
-  </a>
-</p>
-
----
 
 <p align="center">
-⚡ Pair → Deploy → 🤖 Bot Active
+  <img src="https://files.catbox.moe/0r9w3y.jpg" width="150" style="border-radius:50%"/>
 </p>
+
+<h1 align="center">🤖 SHIIQ BOT</h1>
+
+
+  <p align="center">
+    <strong>🤖 SHIIQ AXMAD BOT</strong>
+</p>
+
+<p align="center">
+    <strong>1. FORK REPOSITORY</strong>
+  <br>
+    <a href="https://github.com/shiiqaxmad/shiiqaxmad/fork" target="_blank">
+        <img alt="Fork Repo" src="https://img.shields.io/badge/Fork%20Repo-100000?style=for-the-badge&logo=github&logoColor=white&labelColor=darkblue&color=darkblue"/>
+    </a>
+</p>
+
+<p align="center">
+    <strong>2. SESSION ID & DEPLOYMENTS</strong>
+    <br>
+    <a href="https://github.com/shiiqaxmad/shiiqaxmad/" target="_blank">
+        <img alt="WEBSITE" src="https://img.shields.io/badge/Let%27s_Go-100000?style=for-the-badge&logo=google-chrome&logoColor=white&labelColor=darkred&color=darkred"/>
+    </a>
+</p>
+
