@@ -1,17 +1,17 @@
 <h1 align="center">🤖 SHIIQ BOT PRO MAX</h1>
 
 <p align="center">
-  😈 Hacker Mode Activated | ⚡ Ultra Pairing | 🧠 Anti Ban System
+  😈 Hacker Mode | ⚡ Ultra Pairing | 🧠 Anti Ban
+</p>
+
+<p align="center">
+  <img src="https://i.imgur.com/Zb8YQWQ.jpeg" width="350"/>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/STATUS-ACTIVE-brightgreen?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/MODE-HACKER-black?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/ENGINE-BAILEYS-orange?style=for-the-badge"/>
-</p>
-
-<p align="center">
-  <img src="https://i.imgur.com/8Km9tLL.gif" width="300"/>
 </p>
 
 ---
@@ -32,7 +32,7 @@
 
 ---
 
-## 🚀 DEPLOY OPTIONS
+## 🚀 DEPLOY
 
 <p align="center">
 
@@ -40,7 +40,7 @@
   <img src="https://img.shields.io/badge/DEPLOY_RENDER-blue?style=for-the-badge&logo=render"/>
 </a>
 
-<a href="https://github.com/YOUR-USERNAME/YOUR-REPO/fork">
+<a href="https://github.com/shiiqaxmad/shiiq-bot-pro/fork">
   <img src="https://img.shields.io/badge/FORK_REPOSITORY-black?style=for-the-badge&logo=github"/>
 </a>
 
@@ -48,16 +48,15 @@
 
 ---
 
-## 🧠 SYSTEM FEATURES (HACKER MODE)
+## 🧠 SYSTEM (HACKER TERMINAL)
 
 ```bash
-> Booting SHIIQ BOT PRO MAX...
-> Initializing core system...
+> Booting SHIIQ BOT...
+> Injecting modules...
 
-[✔] AntiBan System ............. ACTIVE
-[✔] Ultra Pairing Engine ....... READY
-[✔] Smart Reconnect ............ ONLINE
-[✔] QR Scanner ................ READY
-[✔] Uptime Engine ............. 24/7
+[✔] AntiBan ............ ACTIVE
+[✔] Pair Engine ........ FAST
+[✔] Reconnect .......... ONLINE
+[✔] QR System .......... READY
 
-> Status: ALL SYSTEMS GO 🚀
+> STATUS: RUNNING 24/7 🚀
