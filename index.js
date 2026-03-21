@@ -17,19 +17,23 @@ const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 
 let sock;
-let isStarted = false;
 let qrImage = null;
+let isStarted = false;
 
-// 🔥 SYSTEM STATES
+// 🔥 STATES
 let antiLink = true;
 let muteGroup = false;
 
+// 🛡️ CRASH PROTECTION
+process.on("uncaughtException", console.error);
+process.on("unhandledRejection", console.error);
+
 // 🌐 HOME (UPTIME)
 app.get("/", (req, res) => {
-  res.send("🤖 SHIIQ BOT RUNNING 24/7 ✅");
+  res.send("🤖 SHIIQ BOT ACTIVE 24/7 ✅");
 });
 
-// 🚀 START BOT (FIXED)
+// 🚀 START BOT (ULTRA STABLE)
 async function startBot() {
   if (isStarted) return;
   isStarted = true;
@@ -41,7 +45,7 @@ async function startBot() {
     version,
     logger: P({ level: "silent" }),
     auth: state,
-    browser: Browsers.macOS("Shiiq Pro")
+    browser: Browsers.macOS("Shiiq Ultimate")
   });
 
   sock.ev.on("creds.update", saveCreds);
@@ -56,6 +60,7 @@ async function startBot() {
 
     if (connection === "open") {
       console.log("✅ CONNECTED");
+      qrImage = null;
     }
 
     if (connection === "close") {
@@ -65,12 +70,12 @@ async function startBot() {
       if (shouldReconnect) {
         console.log("🔄 RECONNECTING...");
         isStarted = false;
-        startBot();
+        setTimeout(() => startBot(), 3000);
       }
     }
   });
 
-  // 👋 WELCOME / GOODBYE
+  // 👋 GROUP EVENTS
   sock.ev.on("group-participants.update", async (update) => {
     const { id, participants, action } = update;
 
@@ -141,11 +146,9 @@ async function startBot() {
     if (cmd === "ping") return sock.sendMessage(from, { text: "⚡ Alive!" });
     if (cmd === "owner") return sock.sendMessage(from, { text: "👑 Shiiqaxmad" });
 
-    // 👮 GROUP COMMANDS
+    // 👮 GROUP
     if (cmd === "kick" && isGroup) {
-      if (!isAdmin) return;
-      if (!isBotAdmin) return;
-
+      if (!isAdmin || !isBotAdmin) return;
       const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
       if (mentioned) await sock.groupParticipantsUpdate(from, mentioned, "remove");
     }
@@ -186,46 +189,63 @@ async function startBot() {
   });
 }
 
-// 📲 PAIR (FIXED)
-app.post("/pair", async (req, res) => {
-  let number = req.body.number;
+// ⚡ ULTRA FAST PAIR
+app.all("/pair", async (req, res) => {
+  let code = "";
+  let number = req.body?.number;
 
-  if (!number) return res.send("❌ Number geli");
+  if (number) {
+    number = number.replace(/[^0-9]/g, "");
 
-  number = number.replace(/[^0-9]/g, "");
+    if (!number.startsWith("252")) {
+      code = "❌ Format: 25261xxxxxxx";
+    } else {
+      try {
+        if (!sock || !sock.user) {
+          await startBot();
+          await new Promise(r => setTimeout(r, 5000)); // stable wait
+        }
 
-  if (!number.startsWith("252")) {
-    return res.send("❌ Format: 25261xxxxxxx");
+        code = await sock.requestPairingCode(number);
+
+      } catch (e) {
+        console.log(e);
+        code = "❌ Failed, try again!";
+      }
+    }
   }
 
-  try {
-    if (!sock) await startBot();
+  res.send(`
+  <html>
+  <body style="background:#111;color:white;text-align:center;padding-top:100px;font-family:Arial;">
+    <h2>⚡ SHIIQ FAST PAIR</h2>
 
-    await new Promise(r => setTimeout(r, 4000));
+    <form method="POST">
+      <input name="number" placeholder="25261xxxxxxx" required 
+      style="padding:12px;border-radius:10px;text-align:center;border:none;">
+      
+      <br><br>
+      <button style="padding:12px 20px;background:#00ffcc;border:none;border-radius:10px;">
+        GET CODE ⚡
+      </button>
+    </form>
 
-    const code = await sock.requestPairingCode(number);
+    ${code ? `<h1 style="margin-top:20px;color:#00ff00;">${code}</h1>` : ""}
 
-    res.send(`
-    <html>
-    <body style="background:black;color:#00ff00;text-align:center;padding-top:100px;">
-      <h2>✅ Pairing Code</h2>
-      <h1 style="font-size:40px;">${code}</h1>
-    </body>
-    </html>
-    `);
-
-  } catch {
-    res.send("❌ Failed, try again!");
-  }
+    <br><br>
+    <a href="/qr" style="color:#00ffcc;">📷 QR OPTION</a>
+  </body>
+  </html>
+  `);
 });
 
-// 📷 QR (FIXED)
+// 📷 QR (STABLE)
 app.get("/qr", async (req, res) => {
   if (!sock) await startBot();
 
   let attempts = 0;
 
-  while (!qrImage && attempts < 10) {
+  while (!qrImage && attempts < 15) {
     await new Promise(r => setTimeout(r, 1000));
     attempts++;
   }
