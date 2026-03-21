@@ -4,7 +4,6 @@ const {
   default: makeWASocket,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
-  Browsers,
   DisconnectReason
 } = require("@whiskeysockets/baileys");
 
@@ -17,14 +16,13 @@ app.use(express.urlencoded({ extended: true }));
 
 let sock;
 let qrImage = null;
-let isStarted = false;
 
 // 🌐 HOME
 app.get("/", (req, res) => {
   res.send(`
   <html>
   <body style="background:black;color:white;text-align:center;padding-top:100px;font-family:sans-serif;">
-    <h1 style="color:#00ffcc;">⚡ SHIIQ BOT PRO ⚡</h1>
+    <h1 style="color:#00ffcc;">⚡ SHIIQ BOT FINAL ⚡</h1>
 
     <a href="/pair">
       <button style="padding:15px 25px;background:#00ff00;border:none;border-radius:10px;">
@@ -46,17 +44,13 @@ app.get("/", (req, res) => {
 
 // 🚀 START BOT
 async function startBot() {
-  if (isStarted) return;
-  isStarted = true;
-
   const { state, saveCreds } = await useMultiFileAuthState("./session");
   const { version } = await fetchLatestBaileysVersion();
 
   sock = makeWASocket({
     version,
     logger: P({ level: "silent" }),
-    auth: state,
-    browser: Browsers.macOS("Shiiq Bot Pro")
+    auth: state
   });
 
   sock.ev.on("creds.update", saveCreds);
@@ -70,7 +64,7 @@ async function startBot() {
     }
 
     if (connection === "open") {
-      console.log("CONNECTED");
+      console.log("✅ CONNECTED");
       qrImage = null;
     }
 
@@ -78,14 +72,13 @@ async function startBot() {
       const code = lastDisconnect?.error?.output?.statusCode;
 
       if (code !== DisconnectReason.loggedOut) {
-        console.log("RECONNECT...");
-        isStarted = false;
-        setTimeout(() => startBot(), 4000);
+        console.log("🔄 RECONNECT...");
+        setTimeout(startBot, 4000);
       }
     }
   });
 
-  // 🤖 SMART BOT
+  // 🤖 SIMPLE BOT
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
@@ -96,61 +89,13 @@ async function startBot() {
       msg.message.extendedTextMessage?.text ||
       "";
 
-    const t = text.toLowerCase();
-
-    // ❌ only trigger magaca
-    if (!t.includes("shiiq bot")) return;
-
-    await new Promise(r => setTimeout(r, 700 + Math.random() * 1000));
-
-    // 😎 random replies (natural)
-    const replies = [
-      "😎 Haa bro waan joogaa",
-      "🤖 Waan ku maqlayaa maxaa jira?",
-      "👀 Yaa i wacay?",
-      "🔥 Shiiq Bot online hadal",
-      "😂 Haye maxaa kaa galay?",
-      "⚡ Waan shaqeynayaa wali",
-      "😏 Haa iga waran"
-    ];
-
-    const random = () => replies[Math.floor(Math.random() * replies.length)];
-
-    // 👑 owner
-    if (t.includes("yaa sameeyay") || t.includes("owner")) {
-      return sock.sendMessage(from, {
-        text: "👑 Sheikh Axmad"
-      });
+    if (text.toLowerCase() === "hi") {
+      await sock.sendMessage(from, { text: "👋 Hello!" });
     }
-
-    // ❤️ special
-    if (t.includes("madaxey gangs mataqaan")) {
-      return sock.sendMessage(from, {
-        text: "❤️ Waa jacaylka Shiiq Axmad"
-      });
-    }
-
-    // 😂 kaftan
-    if (t.includes("sidee tahay")) {
-      return sock.sendMessage(from, {
-        text: "😄 Waan fiicanahay adiguna?"
-      });
-    }
-
-    if (t.includes("maxaad qabataa")) {
-      return sock.sendMessage(from, {
-        text: "🤖 Waxaan ahay bot pro max ah 😎"
-      });
-    }
-
-    // 🔥 default
-    return sock.sendMessage(from, {
-      text: random()
-    });
   });
 }
 
-// ⚡ PAIR
+// ⚡ PAIR (FIXED)
 app.all("/pair", async (req, res) => {
   let number = req.body?.number || "";
   let code = "";
@@ -158,28 +103,29 @@ app.all("/pair", async (req, res) => {
   if (number) {
     number = number.replace(/[^0-9]/g, "");
 
-    if (number.startsWith("252")) {
+    if (!number.startsWith("252")) {
+      code = "❌ Invalid number";
+    } else {
       try {
         if (!sock) await startBot();
 
-        // sug yar
-        for (let i = 0; i < 15; i++) {
-          if (sock?.user) break;
+        // ✅ sug ilaa bot CONNECTED noqdo
+        let tries = 0;
+        while ((!sock || !sock.user) && tries < 20) {
           await new Promise(r => setTimeout(r, 1000));
+          tries++;
         }
 
-        try {
+        if (!sock?.user) {
+          code = "⏳ Bot starting... try again";
+        } else {
           code = await sock.requestPairingCode(number);
-        } catch (err) {
-          console.log(err);
-          code = "❌ Try again";
         }
 
-      } catch {
-        code = "❌ Error";
+      } catch (err) {
+        console.log("PAIR ERROR:", err);
+        code = "❌ Try again";
       }
-    } else {
-      code = "❌ Invalid number";
     }
   }
 
@@ -211,25 +157,19 @@ app.all("/pair", async (req, res) => {
 app.get("/qr", async (req, res) => {
   if (!sock) await startBot();
 
-  let attempts = 0;
-  while (!qrImage && attempts < 20) {
+  let tries = 0;
+  while (!qrImage && tries < 20) {
     await new Promise(r => setTimeout(r, 1000));
-    attempts++;
+    tries++;
   }
 
   if (!qrImage) return res.send("❌ QR not ready");
 
-  res.send(`
-  <html>
-  <body style="background:black;text-align:center;padding-top:50px;">
-    <img src="${qrImage}" width="250"/>
-  </body>
-  </html>
-  `);
+  res.send(`<img src="${qrImage}" width="250"/>`);
 });
 
 // 🚀 SERVER
 app.listen(PORT, async () => {
-  console.log("RUNNING...");
+  console.log("🚀 RUNNING...");
   await startBot();
 });
