@@ -1,57 +1,45 @@
-<h1 align="center">👨‍💻 SHIIQAXMAD</h1>
+<h1 align="center" style="color:#00ffcc;">⚡ SHIIQ BOT ⚡</h1>
 
 <p align="center">
-🚀 WhatsApp Bot Developer
+✨ <b style="color:#00ffcc;">Neon Powered • Smart Bot • Future Tech</b> ✨
 </p>
 
 ---
 
-## 🍴 FORK
-
 <p align="center">
+
 <a href="https://github.com/shiiqaxmad/shiiq-bot/fork">
-  <img src="https://img.shields.io/badge/FORK-black?style=for-the-badge&logo=github"/>
+  <img src="https://img.shields.io/badge/FORK-000000?style=for-the-badge&logo=github&logoColor=00ffcc"/>
 </a>
-</p>
 
----
-
-## 📲 PAIRING
-
-<p align="center">
+<br><br>
 
 <a href="https://shiiqaxmad.onrender.com/pair">
-  <img src="https://img.shields.io/badge/PAIR_CODE-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
+  <img src="https://img.shields.io/badge/PAIR-000000?style=for-the-badge&logo=whatsapp&logoColor=00ffcc"/>
 </a>
 
-&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;
 
 <a href="https://shiiqaxmad.onrender.com/qr">
-  <img src="https://img.shields.io/badge/QR_CODE-black?style=for-the-badge&logo=whatsapp"/>
+  <img src="https://img.shields.io/badge/QR-000000?style=for-the-badge&logo=whatsapp&logoColor=00ffcc"/>
 </a>
 
-</p>
-
----
-
-## 🚀 DEPLOY
-
-<p align="center">
+<br><br>
 
 <a href="https://replit.com/new/nodejs">
-  <img src="https://img.shields.io/badge/REPLIT-orange?style=for-the-badge&logo=replit"/>
+  <img src="https://img.shields.io/badge/REPLIT-000000?style=for-the-badge&logo=replit&logoColor=00ffcc"/>
 </a>
 
 &nbsp;&nbsp;
 
 <a href="https://render.com/deploy?repo=https://github.com/shiiqaxmad/shiiq-bot">
-  <img src="https://img.shields.io/badge/RENDER-blue?style=for-the-badge&logo=render"/>
+  <img src="https://img.shields.io/badge/RENDER-000000?style=for-the-badge&logo=render&logoColor=00ffcc"/>
 </a>
 
 &nbsp;&nbsp;
 
 <a href="https://railway.app/new/template?template=https://github.com/shiiqaxmad/shiiq-bot">
-  <img src="https://img.shields.io/badge/RAILWAY-purple?style=for-the-badge&logo=railway"/>
+  <img src="https://img.shields.io/badge/RAILWAY-000000?style=for-the-badge&logo=railway&logoColor=00ffcc"/>
 </a>
 
 </p>
@@ -59,5 +47,5 @@
 ---
 
 <p align="center">
-🤖 SHIIQ BOT PRO
+⚡ <span style="color:#00ffcc;">SYSTEM READY</span> • 🤖 BOT ACTIVE • 🚀 FUTURE MODE
 </p>
