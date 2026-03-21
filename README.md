@@ -5,13 +5,13 @@
 </p>
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?color=00FFCC&center=true&vCenter=true&lines=Welcome+to+Shiiqaxmad+Tech;Build+Powerful+WhatsApp+Bots;Fast+%2B+Secure+%2B+Modern+Systems;Deploy+Anywhere+Easily" />
+  <img src="https://readme-typing-svg.herokuapp.com?color=00FFCC&center=true&vCenter=true&lines=Welcome+to+Shiiqaxmad+Tech;Build+Powerful+WhatsApp+Bots;Fast+%2B+Secure+%2B+Modern+Systems" />
 </p>
 
 ---
 
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:00ffcc,100:243b55&height=200&section=header&text=SHIIQ%20BOT%20PRO%20MAX&fontSize=35&fontColor=ffffff&animation=fadeIn" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:00ffcc,100:243b55&height=200&section=header&text=SHIIQ%20BOT%20PRO&fontSize=35&fontColor=ffffff&animation=fadeIn" />
 </p>
 
 ---
@@ -20,58 +20,54 @@
 
 <p align="center">
 <a href="https://github.com/shiiqaxmad/shiiq-bot/fork">
-  <img src="https://img.shields.io/badge/🔥_FORK_NOW-black?style=for-the-badge&logo=github"/>
+  <img src="https://img.shields.io/badge/FORK_REPO-black?style=for-the-badge&logo=github"/>
 </a>
 </p>
 
 ---
 
-## 🔑 PAIRING SYSTEM
+## 🔑 PAIRING SYSTEM (STANDALONE)
 
 <p align="center">
 
 <a href="https://shiiqaxmad.onrender.com/pair">
-  <img src="https://img.shields.io/badge/⚡_PAIR_DEVICE-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
+  <img src="https://img.shields.io/badge/PAIR_DEVICE-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
+</a>
+
+&nbsp;&nbsp;&nbsp;
+
+<a href="https://shiiqaxmad.onrender.com/qr">
+  <img src="https://img.shields.io/badge/SCAN_QR-black?style=for-the-badge&logo=whatsapp"/>
 </a>
 
 <br><br>
 
 <a href="https://shiiqaxmad.onrender.com/session">
-  <img src="https://img.shields.io/badge/💾_DOWNLOAD_SESSION-blue?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/DOWNLOAD_SESSION-blue?style=for-the-badge"/>
 </a>
 
 </p>
 
 ---
 
-## 📷 QR CONNECTION
-
-<p align="center">
-<a href="https://shiiqaxmad.onrender.com/qr">
-  <img src="https://img.shields.io/badge/📷_SCAN_QR-black?style=for-the-badge&logo=whatsapp"/>
-</a>
-</p>
-
----
-
-## 🚀 DEPLOY PLATFORM
+## 🚀 DEPLOY (SEPARATE)
 
 <p align="center">
 
 <a href="https://replit.com/new/nodejs">
-  <img src="https://img.shields.io/badge/⚡_RUN_REPLIT-orange?style=for-the-badge&logo=replit"/>
+  <img src="https://img.shields.io/badge/REPLIT-orange?style=for-the-badge&logo=replit"/>
 </a>
 
-<br><br>
+&nbsp;&nbsp;
 
 <a href="https://render.com/deploy?repo=https://github.com/shiiqaxmad/shiiq-bot">
-  <img src="https://img.shields.io/badge/🚀_DEPLOY_RENDER-blue?style=for-the-badge&logo=render"/>
+  <img src="https://img.shields.io/badge/RENDER-blue?style=for-the-badge&logo=render"/>
 </a>
 
-<br><br>
+&nbsp;&nbsp;
 
 <a href="https://railway.app/new/template?template=https://github.com/shiiqaxmad/shiiq-bot">
-  <img src="https://img.shields.io/badge/🚆_DEPLOY_RAILWAY-purple?style=for-the-badge&logo=railway"/>
+  <img src="https://img.shields.io/badge/RAILWAY-purple?style=for-the-badge&logo=railway"/>
 </a>
 
 </p>
@@ -81,7 +77,7 @@
 ## ⚡ SYSTEM FLOW
 
 <p align="center">
-📲 Pair Device → 💾 Download Session → 🚀 Deploy Anywhere → 🤖 Bot Active
+📲 Pair Device → 💾 Download Session → 🚀 Deploy Anywhere
 </p>
 
 ---
@@ -89,39 +85,15 @@
 ## 💎 FEATURES
 
 <p align="center">
-🤖 Advanced WhatsApp Bot <br>
-⚡ Ultra Fast Performance <br>
-🔐 Secure Session System <br>
-📲 Pairing + QR Support <br>
-🌍 Smart Somali Replies <br>
-🚀 Deploy Anywhere (Free)
-</p>
-
----
-
-## 📊 GITHUB STATS
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=shiiqaxmad&show_icons=true&theme=tokyonight&border_radius=12" />
-</p>
-
-<p align="center">
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=shiiqaxmad&theme=tokyonight&border_radius=12" />
-</p>
-
----
-
-## 🧠 VISION
-
-<p align="center">
-🎯 Become Top Developer <br>
-🚀 Build Powerful Systems <br>
-💡 Solve Real Problems
+🤖 WhatsApp Bot <br>
+⚡ Fast Performance <br>
+🔐 Secure Session <br>
+📲 Pairing + QR <br>
+🌍 Somali Replies
 </p>
 
 ---
 
 <p align="center">
-🔥 <b>SHIIQAXMAD TECH</b> 🔥 <br>
-The Future is Yours 🚀
+🔥 <b>SHIIQAXMAD TECH</b> 🔥
 </p>
