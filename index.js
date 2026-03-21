@@ -4,6 +4,7 @@ const {
   default: makeWASocket,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
+  Browsers,
   DisconnectReason
 } = require("@whiskeysockets/baileys");
 
@@ -16,41 +17,49 @@ app.use(express.urlencoded({ extended: true }));
 
 let sock;
 let qrImage = null;
+let isStarted = false;
 
 // 🌐 HOME
 app.get("/", (req, res) => {
   res.send(`
   <html>
-  <body style="background:black;color:white;text-align:center;padding-top:100px;font-family:sans-serif;">
-    <h1 style="color:#00ffcc;">⚡ SHIIQ BOT FINAL ⚡</h1>
+  <body style="background:black;color:white;text-align:center;padding-top:100px;">
+    <h1>⚡ SHIIQ BOT ⚡</h1>
 
-    <a href="/pair">
-      <button style="padding:15px 25px;background:#00ff00;border:none;border-radius:10px;">
-        🔑 PAIR
-      </button>
-    </a>
-
+    <a href="/status"><button>STATUS</button></a>
     <br><br>
 
-    <a href="/qr">
-      <button style="padding:15px 25px;background:#00ccff;border:none;border-radius:10px;">
-        📷 QR
-      </button>
-    </a>
+    <a href="/pair"><button>PAIR</button></a>
+    <br><br>
+
+    <a href="/qr"><button>QR</button></a>
   </body>
   </html>
   `);
 });
 
+// ✅ STATUS
+app.get("/status", (req, res) => {
+  if (sock?.user) {
+    res.send("✅ READY");
+  } else {
+    res.send("⏳ NOT READY");
+  }
+});
+
 // 🚀 START BOT
 async function startBot() {
+  if (isStarted) return;
+  isStarted = true;
+
   const { state, saveCreds } = await useMultiFileAuthState("./session");
   const { version } = await fetchLatestBaileysVersion();
 
   sock = makeWASocket({
     version,
     logger: P({ level: "silent" }),
-    auth: state
+    auth: state,
+    browser: Browsers.macOS("Shiiq Bot")
   });
 
   sock.ev.on("creds.update", saveCreds);
@@ -60,25 +69,23 @@ async function startBot() {
 
     if (qr) {
       qrImage = await QRCode.toDataURL(qr);
-      console.log("QR READY");
     }
 
     if (connection === "open") {
-      console.log("✅ CONNECTED");
       qrImage = null;
+      console.log("CONNECTED");
     }
 
     if (connection === "close") {
       const code = lastDisconnect?.error?.output?.statusCode;
-
       if (code !== DisconnectReason.loggedOut) {
-        console.log("🔄 RECONNECT...");
-        setTimeout(startBot, 4000);
+        isStarted = false;
+        setTimeout(() => startBot(), 4000);
       }
     }
   });
 
-  // 🤖 SIMPLE BOT
+  // 🤖 COMMANDS (ONLY WHEN "shiiq bot" LA SHEEGO)
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
@@ -89,13 +96,42 @@ async function startBot() {
       msg.message.extendedTextMessage?.text ||
       "";
 
-    if (text.toLowerCase() === "hi") {
-      await sock.sendMessage(from, { text: "👋 Hello!" });
+    const t = text.toLowerCase();
+
+    // ❗ magaca waa in la sheego
+    if (!t.includes("shiiq bot")) return;
+
+    await new Promise(r => setTimeout(r, 700));
+
+    // 👑 owner
+    if (t.includes("yaa sameeyay") || t.includes("owner")) {
+      return sock.sendMessage(from, {
+        text: "👑 Sheikh Axmad"
+      });
     }
+
+    // ❤️ madaxey gangs
+    if (t.includes("madaxey gangs mataqaan")) {
+      return sock.sendMessage(from, {
+        text: "❤️ Waa jacaylka Shiiq Axmad"
+      });
+    }
+
+    // 😂 salaam
+    if (t.includes("salaamay") || t.includes("hi")) {
+      return sock.sendMessage(from, {
+        text: "👋 Wcs bro"
+      });
+    }
+
+    // 😎 default reply
+    return sock.sendMessage(from, {
+      text: "😎 Haa waa aniga Shiiq Bot"
+    });
   });
 }
 
-// ⚡ PAIR (FIXED)
+// ⚡ PAIR
 app.all("/pair", async (req, res) => {
   let number = req.body?.number || "";
   let code = "";
@@ -103,51 +139,45 @@ app.all("/pair", async (req, res) => {
   if (number) {
     number = number.replace(/[^0-9]/g, "");
 
-    if (!number.startsWith("252")) {
-      code = "❌ Invalid number";
-    } else {
+    if (number.startsWith("252")) {
       try {
         if (!sock) await startBot();
 
-        // ✅ sug ilaa bot CONNECTED noqdo
-        let tries = 0;
-        while ((!sock || !sock.user) && tries < 20) {
+        let ready = false;
+        for (let i = 0; i < 25; i++) {
+          if (sock?.user) {
+            ready = true;
+            break;
+          }
           await new Promise(r => setTimeout(r, 1000));
-          tries++;
         }
 
-        if (!sock?.user) {
-          code = "⏳ Bot starting... try again";
+        if (!ready) {
+          code = "⏳ Sug yar...";
         } else {
           code = await sock.requestPairingCode(number);
         }
 
-      } catch (err) {
-        console.log("PAIR ERROR:", err);
-        code = "❌ Try again";
+      } catch {
+        code = "❌ Failed";
       }
+    } else {
+      code = "❌ Invalid number";
     }
   }
 
   res.send(`
   <html>
-  <body style="background:#0f0f0f;color:white;text-align:center;padding-top:100px;">
+  <body style="background:black;color:white;text-align:center;padding-top:100px;">
     <h1>PAIR</h1>
 
     <form method="POST">
-      <input name="number" placeholder="25261xxxxxxx" required
-      style="padding:12px;border-radius:10px;text-align:center;border:none;">
-      
+      <input name="number" placeholder="25261xxxxxxx" required>
       <br><br>
-      <button style="padding:12px 20px;background:#00ffcc;border:none;border-radius:10px;">
-        GET CODE
-      </button>
+      <button>GET CODE</button>
     </form>
 
-    ${code ? `<h2 style="color:#00ff00;">${code}</h2>` : ""}
-
-    <br><br>
-    <a href="/qr" style="color:#00ccff;">QR</a>
+    ${code ? `<h2>${code}</h2>` : ""}
   </body>
   </html>
   `);
@@ -157,19 +187,19 @@ app.all("/pair", async (req, res) => {
 app.get("/qr", async (req, res) => {
   if (!sock) await startBot();
 
-  let tries = 0;
-  while (!qrImage && tries < 20) {
+  let attempts = 0;
+  while (!qrImage && attempts < 20) {
     await new Promise(r => setTimeout(r, 1000));
-    tries++;
+    attempts++;
   }
 
-  if (!qrImage) return res.send("❌ QR not ready");
+  if (!qrImage) return res.send("❌");
 
   res.send(`<img src="${qrImage}" width="250"/>`);
 });
 
 // 🚀 SERVER
 app.listen(PORT, async () => {
-  console.log("🚀 RUNNING...");
+  console.log("RUNNING...");
   await startBot();
 });
