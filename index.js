@@ -20,48 +20,35 @@ let sock;
 let isStarted = false;
 let qrImage = null;
 
-// 🌐 HOME (DESIGN PRO)
+// 🌐 HOME
 app.get("/", (req, res) => {
   res.send(`
   <html>
   <body style="background:linear-gradient(135deg,#141e30,#243b55);color:white;text-align:center;padding-top:150px;font-family:Arial;">
-    <h1>🤖 Shiiq Bot</h1>
-    <p>WhatsApp Bot Ready ✅</p>
+    <h1>🤖 SHIIQ BOT PRO</h1>
+    <p>Ultimate Version 🚀</p>
 
-    <a href="/pair" style="padding:12px 25px;background:#00ffcc;color:black;border-radius:10px;text-decoration:none;">
-      📲 Pair Code
-    </a>
-
+    <a href="/pair" style="padding:12px 25px;background:#00ffcc;color:black;border-radius:10px;">📲 Pair</a>
     <br><br>
-
-    <a href="/qr" style="padding:12px 25px;background:#00ffcc;color:black;border-radius:10px;text-decoration:none;">
-      📷 Scan QR
-    </a>
+    <a href="/qr" style="padding:12px 25px;background:#00ffcc;color:black;border-radius:10px;">📷 QR</a>
   </body>
   </html>
   `);
 });
 
-// 📲 PAIR PAGE (QURUX)
+// 📲 PAIR
 app.get("/pair", (req, res) => {
   res.send(`
   <html>
-  <body style="background:linear-gradient(135deg,#1e3c72,#2a5298);color:white;text-align:center;padding-top:100px;font-family:Arial;">
+  <body style="background:#111;color:white;text-align:center;padding-top:100px;">
     <h2>📲 Pair WhatsApp</h2>
-
     <form method="POST" action="/pair">
-      <input name="number" placeholder="25261xxxxxxx" required 
-      style="padding:12px;border-radius:10px;border:none;text-align:center;">
+      <input name="number" placeholder="25261xxxxxxx" required style="padding:10px;border-radius:10px;">
       <br><br>
-
-      <button type="submit" 
-      style="padding:12px 25px;background:#00ffcc;border:none;border-radius:10px;">
-      GET CODE
-      </button>
+      <button style="padding:10px 20px;background:#00ffcc;border:none;border-radius:10px;">GET CODE</button>
     </form>
-
     <br>
-    <a href="/qr" style="color:#00ffcc;">📷 Use QR Instead</a>
+    <a href="/qr">📷 Use QR</a>
   </body>
   </html>
   `);
@@ -79,7 +66,7 @@ async function startBot() {
     version,
     logger: P({ level: "silent" }),
     auth: state,
-    browser: Browsers.macOS("Shiiq Bot")
+    browser: Browsers.macOS("Shiiq Ultimate")
   });
 
   sock.ev.on("creds.update", saveCreds);
@@ -87,31 +74,25 @@ async function startBot() {
   sock.ev.on("connection.update", async (update) => {
     const { connection, qr, lastDisconnect } = update;
 
-    if (qr) {
-      qrImage = await QRCode.toDataURL(qr);
-    }
+    if (qr) qrImage = await QRCode.toDataURL(qr);
 
-    if (connection === "open") {
-      console.log("✅ BOT CONNECTED");
-    }
+    if (connection === "open") console.log("✅ CONNECTED");
 
     if (connection === "close") {
-      const reason = lastDisconnect?.error?.output?.statusCode;
-
-      if (reason !== DisconnectReason.loggedOut) {
-        console.log("🔄 Reconnecting...");
+      if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
         isStarted = false;
         startBot();
       }
     }
   });
 
-  // 🤖 BOT LOGIC (AUTO + COMMANDS)
+  // 🤖 BOT LOGIC
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
 
     const from = msg.key.remoteJid;
+    const isGroup = from.endsWith("@g.us");
 
     const text =
       msg.message.conversation ||
@@ -120,32 +101,24 @@ async function startBot() {
 
     const body = text.toLowerCase();
 
-    // ================= AUTO REPLY =================
-    if (body.includes("sidee tahay")) {
-      return sock.sendMessage(from, { text: "Waan fiicanahay 😊 adigana?" });
-    }
+    // 🔥 AUTO AI (simple)
+    if (!body.startsWith("shiiq")) {
+      if (body.includes("sidee tahay"))
+        return sock.sendMessage(from, { text: "Waan fiicanahay 😎 adigana?" });
 
-    if (body.includes("maxaa kaa galay")) {
-      return sock.sendMessage(from, { text: "Waxba ima gelin 😄" });
-    }
+      if (body.includes("yaa ku sameeyay"))
+        return sock.sendMessage(from, { text: "🤖 Waxaa i sameeyay Shiiqaxmad" });
 
-    if (body.includes("yaa ku sameeyay")) {
-      return sock.sendMessage(from, { text: "🤖 Waxaa i sameeyay Shiiqaxmad 👑" });
+      return;
     }
-
-    if (body.includes("mahadsanid")) {
-      return sock.sendMessage(from, { text: "Adigaa mudan 🙌" });
-    }
-
-    // ================= COMMANDS =================
-    if (!body.startsWith("shiiq")) return;
 
     const cmd = body.replace("shiiq", "").trim();
 
+    // 📜 MENU
     if (cmd === "menu") {
       return sock.sendMessage(from, {
         text: `
-🤖 SHIIQ BOT
+🤖 *SHIIQ ULTIMATE BOT*
 
 👋 hi
 ⚡ ping
@@ -153,6 +126,14 @@ async function startBot() {
 👑 owner
 😂 joke
 📊 status
+
+👮 kick
+🔇 mute
+🔊 unmute
+
+🎬 tiktok
+🎧 song
+🤖 ai
         `
       });
     }
@@ -162,7 +143,7 @@ async function startBot() {
     }
 
     if (cmd === "ping") {
-      return sock.sendMessage(from, { text: "⚡ Bot is alive!" });
+      return sock.sendMessage(from, { text: "⚡ Speed OK!" });
     }
 
     if (cmd === "time") {
@@ -172,78 +153,114 @@ async function startBot() {
     }
 
     if (cmd === "owner") {
-      return sock.sendMessage(from, {
-        text: "👑 Shiiqaxmad"
-      });
+      return sock.sendMessage(from, { text: "👑 Shiiqaxmad" });
     }
 
     if (cmd === "joke") {
       return sock.sendMessage(from, {
-        text: "😂 Bot ayaa hurday sababtoo ah bug badan ayuu qabay!"
+        text: "😂 Bot ayaa yiri: 'Internet iga jooji markaan xanaaqo!'"
       });
     }
 
     if (cmd === "status") {
+      return sock.sendMessage(from, { text: "📊 ONLINE 24/7 🚀" });
+    }
+
+    // 👮 GROUP ADMIN
+    if (isGroup && cmd === "kick") {
+      const user = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
+      if (!user) return sock.sendMessage(from, { text: "Tag user!" });
+
+      await sock.groupParticipantsUpdate(from, user, "remove");
+    }
+
+    if (cmd === "mute") {
+      return sock.sendMessage(from, { text: "🔇 Group muted (demo)" });
+    }
+
+    if (cmd === "unmute") {
+      return sock.sendMessage(from, { text: "🔊 Group unmuted (demo)" });
+    }
+
+    // 🎬 DOWNLOAD (demo)
+    if (cmd.startsWith("tiktok")) {
       return sock.sendMessage(from, {
-        text: "📊 Bot ONLINE ✅"
+        text: "🎬 TikTok download (ku xiro API mustaqbalka)"
+      });
+    }
+
+    if (cmd.startsWith("song")) {
+      return sock.sendMessage(from, {
+        text: "🎧 Song download (ku xiro API)"
+      });
+    }
+
+    // 🤖 AI (simple)
+    if (cmd.startsWith("ai")) {
+      const q = cmd.replace("ai", "").trim();
+
+      if (!q) {
+        return sock.sendMessage(from, { text: "Qor su’aal 😄" });
+      }
+
+      return sock.sendMessage(from, {
+        text: `🤖 Jawaab: "${q}" waa su’aal fiican! 😎`
       });
     }
   });
 }
 
-// 📲 HANDLE PAIR
+// 📲 PAIR
 app.post("/pair", async (req, res) => {
   let number = req.body.number;
+
   if (!number) return res.send("❌ Number geli");
 
   number = number.replace(/[^0-9]/g, "");
 
+  if (!number.startsWith("252")) {
+    return res.send("❌ Format: 25261xxxxxxx");
+  }
+
   try {
     if (!sock) {
       await startBot();
-      await new Promise(r => setTimeout(r, 5000));
+
+      await new Promise(resolve => {
+        sock.ev.on("connection.update", (u) => {
+          if (u.connection === "open") resolve();
+        });
+      });
     }
 
     const code = await sock.requestPairingCode(number);
 
     res.send(`
     <html>
-    <body style="background:black;color:#00ff00;text-align:center;padding-top:100px;font-family:monospace;">
-      <h2>✅ Pairing Code</h2>
-      <h1 style="font-size:40px;">${code}</h1>
-      <p>WhatsApp → Linked Devices → Link with phone number</p>
+    <body style="background:black;color:#00ff00;text-align:center;padding-top:100px;">
+      <h1>${code}</h1>
     </body>
     </html>
     `);
 
-  } catch (err) {
-    res.send("❌ Failed, try again!");
+  } catch {
+    res.send("❌ Failed");
   }
 });
 
-// 📷 QR PAGE
+// 📷 QR
 app.get("/qr", async (req, res) => {
   if (!sock) {
     await startBot();
-    await new Promise(r => setTimeout(r, 4000));
+    await new Promise(r => setTimeout(r, 6000));
   }
 
-  if (!qrImage) {
-    return res.send("⏳ Refresh...");
-  }
+  if (!qrImage) return res.send("⏳ Refresh");
 
-  res.send(`
-  <html>
-  <body style="background:#000;color:white;text-align:center;padding-top:50px;font-family:Arial;">
-    <h2>📷 Scan QR</h2>
-    <img src="${qrImage}" style="width:250px;border-radius:15px;" />
-    <p>WhatsApp → Linked Devices → Scan QR</p>
-  </body>
-  </html>
-  `);
+  res.send(`<img src="${qrImage}" width="250">`);
 });
 
 // 🚀 SERVER
 app.listen(PORT, () => {
-  console.log("🚀 Server running on port " + PORT);
+  console.log("🚀 Ultimate Bot Running");
 });
