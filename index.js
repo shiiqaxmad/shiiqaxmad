@@ -1,4 +1,4 @@
-const express = require("express");
+   const express = require("express");
 const QRCode = require("qrcode");
 
 const {
@@ -20,22 +20,17 @@ let sock;
 let isStarted = false;
 let qrImage = null;
 
-// 🌐 HOME
-app.get("/", (req, res) => {
-  res.send(`
-  <html>
-  <body style="background:linear-gradient(135deg,#141e30,#243b55);color:white;text-align:center;padding-top:120px;font-family:Arial;">
-    <h1>🤖 SHIIQ BOT PRO</h1>
-    <p>Ultimate Version 🚀</p>
+// 🔥 SYSTEM STATES
+let statusMode = true;
+let antiLink = true;
+let muteGroup = false;
 
-    <a href="/pair" style="display:block;margin:15px auto;width:200px;padding:12px;background:#00ffcc;color:black;border-radius:10px;text-decoration:none;">📲 Pairing</a>
-    <a href="/qr" style="display:block;margin:15px auto;width:200px;padding:12px;background:#00ffcc;color:black;border-radius:10px;text-decoration:none;">📷 QR Code</a>
-  </body>
-  </html>
-  `);
+// 🌐 HOME (VPS TRICK)
+app.get("/", (req, res) => {
+  res.send("🤖 SHIIQ BOT RUNNING 24/7 ✅");
 });
 
-// 📲 PAIR (ONE PAGE SYSTEM)
+// 📲 PAIR
 app.all("/pair", async (req, res) => {
   let code = "";
   let number = req.body?.number;
@@ -49,7 +44,7 @@ app.all("/pair", async (req, res) => {
       try {
         if (!sock) {
           await startBot();
-          await new Promise(r => setTimeout(r, 8000));
+          await new Promise(r => setTimeout(r, 10000));
         }
 
         code = await sock.requestPairingCode(number);
@@ -110,18 +105,45 @@ async function startBot() {
     if (connection === "open") console.log("✅ CONNECTED");
 
     if (connection === "close") {
-      if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
+      const shouldReconnect =
+        lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+
+      if (shouldReconnect) {
         isStarted = false;
         startBot();
       }
     }
   });
 
+  // 👋 WELCOME / GOODBYE
+  sock.ev.on("group-participants.update", async (update) => {
+    const { id, participants, action } = update;
+
+    for (let user of participants) {
+      if (action === "add") {
+        await sock.sendMessage(id, {
+          text: `👋 Soo dhawoow @${user.split("@")[0]}`,
+          mentions: [user]
+        });
+      }
+
+      if (action === "remove") {
+        await sock.sendMessage(id, {
+          text: `😢 Nabad galyo @${user.split("@")[0]}`,
+          mentions: [user]
+        });
+      }
+    }
+  });
+
+  // 🤖 MAIN LOGIC
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
 
     const from = msg.key.remoteJid;
+    const isGroup = from.endsWith("@g.us");
+
     const text =
       msg.message.conversation ||
       msg.message.extendedTextMessage?.text ||
@@ -129,13 +151,111 @@ async function startBot() {
 
     const body = text.toLowerCase();
 
-    if (!body.startsWith("shiiq")) return;
+    // 🔥 STATUS
+    if (from === "status@broadcast") {
+      try {
+        await sock.readMessages([msg.key]);
 
+        if (statusMode) {
+          await new Promise(r => setTimeout(r, 3000));
+          await sock.sendMessage(
+            msg.key.participant,
+            { text: "hacker شيخ أحمد 🏴" },
+            { quoted: msg }
+          );
+        }
+      } catch {}
+      return;
+    }
+
+    let participants, isAdmin, isBotAdmin;
+
+    if (isGroup) {
+      const group = await sock.groupMetadata(from);
+      participants = group.participants;
+
+      const sender = msg.key.participant;
+      const botNumber = sock.user.id.split(":")[0] + "@s.whatsapp.net";
+
+      isAdmin = participants.find(p => p.id === sender)?.admin;
+      isBotAdmin = participants.find(p => p.id === botNumber)?.admin;
+    }
+
+    // 🔒 ANTI LINK
+    if (isGroup && antiLink && body.includes("http")) {
+      if (!isAdmin && isBotAdmin) {
+        await sock.sendMessage(from, { delete: msg.key });
+        await sock.sendMessage(from, { text: "🚫 Link lama ogola!" });
+      }
+    }
+
+    // 🔇 MUTE
+    if (isGroup && muteGroup && !isAdmin) {
+      return sock.sendMessage(from, { delete: msg.key });
+    }
+
+    // 🔒 PREFIX
+    if (!body.startsWith("shiiq")) return;
     const cmd = body.replace("shiiq", "").trim();
 
+    // 💬 BASIC
     if (cmd === "hi") return sock.sendMessage(from, { text: "👋 Salaam!" });
     if (cmd === "ping") return sock.sendMessage(from, { text: "⚡ Alive!" });
     if (cmd === "owner") return sock.sendMessage(from, { text: "👑 Shiiqaxmad" });
+
+    // 📲 STATUS CONTROL
+    if (cmd === "status on") {
+      statusMode = true;
+      return sock.sendMessage(from, { text: "✅ Status ON" });
+    }
+
+    if (cmd === "status off") {
+      statusMode = false;
+      return sock.sendMessage(from, { text: "❌ Status OFF" });
+    }
+
+    // 👮 GROUP COMMANDS
+    if (cmd === "kick" && isGroup) {
+      if (!isAdmin) return;
+      if (!isBotAdmin) return;
+
+      const mentioned = msg.message.extendedTextMessage?.contextInfo?.mentionedJid;
+      if (mentioned) await sock.groupParticipantsUpdate(from, mentioned, "remove");
+    }
+
+    if (cmd === "tagall" && isGroup) {
+      let teks = "📢 Tag All:\n\n";
+      participants.forEach(p => {
+        teks += `@${p.id.split("@")[0]}\n`;
+      });
+
+      await sock.sendMessage(from, {
+        text: teks,
+        mentions: participants.map(p => p.id)
+      });
+    }
+
+    if (cmd === "mute" && isGroup) {
+      if (!isAdmin) return;
+      muteGroup = true;
+      sock.sendMessage(from, { text: "🔇 Group muted" });
+    }
+
+    if (cmd === "unmute" && isGroup) {
+      if (!isAdmin) return;
+      muteGroup = false;
+      sock.sendMessage(from, { text: "🔊 Group unmuted" });
+    }
+
+    if (cmd === "antilink on") {
+      antiLink = true;
+      sock.sendMessage(from, { text: "✅ Anti-link ON" });
+    }
+
+    if (cmd === "antilink off") {
+      antiLink = false;
+      sock.sendMessage(from, { text: "❌ Anti-link OFF" });
+    }
   });
 }
 
@@ -143,7 +263,7 @@ async function startBot() {
 app.get("/qr", async (req, res) => {
   if (!sock) {
     await startBot();
-    await new Promise(r => setTimeout(r, 6000));
+    await new Promise(r => setTimeout(r, 8000));
   }
 
   if (!qrImage) return res.send("⏳ Refresh...");
@@ -161,4 +281,4 @@ app.get("/qr", async (req, res) => {
 // 🚀 SERVER
 app.listen(PORT, () => {
   console.log("🚀 SHIIQ BOT RUNNING");
-});
+}); 
