@@ -40,10 +40,10 @@ app.get("/", (req, res) => {
 
 // ✅ STATUS
 app.get("/status", (req, res) => {
-  if (sock && sock.user) {
-    res.send("✅ READY");
+  if (sock) {
+    res.send("🟢 BOT STARTED");
   } else {
-    res.send("⏳ NOT READY");
+    res.send("🔴 BOT STOPPED");
   }
 });
 
@@ -88,7 +88,7 @@ async function startBot() {
     }
   });
 
-  // 🤖 COMMANDS (MA TAABAN)
+  // 🤖 COMMANDS (SIDII AAD RABTAY)
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
@@ -123,7 +123,7 @@ async function startBot() {
   });
 }
 
-// ⚡ PAIR
+// ⚡ PAIR (FIXED)
 app.all("/pair", async (req, res) => {
   let number = req.body?.number || "";
   let code = "";
@@ -135,22 +135,14 @@ app.all("/pair", async (req, res) => {
       try {
         if (!sock) await startBot();
 
-        // sug ilaa bot diyaar noqdo
-        let attempts = 0;
-        while (!sock?.user && attempts < 20) {
-          await new Promise(r => setTimeout(r, 1000));
-          attempts++;
-        }
+        // ❗ muhiim: sug yar oo kaliya, ha sugin sock.user
+        await new Promise(r => setTimeout(r, 3000));
 
-        if (!sock?.user) {
-          code = "⏳ Bot not ready, try again";
-        } else {
-          code = await sock.requestPairingCode(number);
-        }
+        code = await sock.requestPairingCode(number);
 
       } catch (err) {
-        console.log(err);
-        code = "❌ Failed";
+        console.log("PAIR ERROR:", err);
+        code = "❌ Try again";
       }
     } else {
       code = "❌ Invalid number";
