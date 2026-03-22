@@ -17,7 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 
 let sock;
 let qrImage = null;
-let isStarted = false;
 
 // 🌐 HOME
 app.get("/", (req, res) => {
@@ -25,9 +24,6 @@ app.get("/", (req, res) => {
   <html>
   <body style="background:black;color:white;text-align:center;padding-top:100px;">
     <h1>⚡ SHIIQ BOT ⚡</h1>
-
-    <a href="/status"><button>STATUS</button></a>
-    <br><br>
 
     <a href="/pair"><button>PAIR</button></a>
     <br><br>
@@ -38,20 +34,8 @@ app.get("/", (req, res) => {
   `);
 });
 
-// ✅ STATUS
-app.get("/status", (req, res) => {
-  if (sock) {
-    res.send("🟢 BOT STARTED");
-  } else {
-    res.send("🔴 BOT STOPPED");
-  }
-});
-
 // 🚀 START BOT
 async function startBot() {
-  if (isStarted) return;
-  isStarted = true;
-
   const { state, saveCreds } = await useMultiFileAuthState("./session");
   const { version } = await fetchLatestBaileysVersion();
 
@@ -65,7 +49,7 @@ async function startBot() {
   sock.ev.on("creds.update", saveCreds);
 
   sock.ev.on("connection.update", async (update) => {
-    const { connection, qr, lastDisconnect } = update;
+    const { connection, qr } = update;
 
     if (qr) {
       qrImage = await QRCode.toDataURL(qr);
@@ -78,17 +62,12 @@ async function startBot() {
     }
 
     if (connection === "close") {
-      const code = lastDisconnect?.error?.output?.statusCode;
-      console.log("DISCONNECTED:", code);
-
-      if (code !== DisconnectReason.loggedOut) {
-        isStarted = false;
-        setTimeout(() => startBot(), 5000);
-      }
+      console.log("RECONNECTING...");
+      setTimeout(startBot, 5000);
     }
   });
 
-  // 🤖 COMMANDS (SIDII AAD RABTAY)
+  // 🤖 COMMANDS (SIDII AAD RABTAY - LAMA TAABAN)
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
@@ -135,13 +114,13 @@ app.all("/pair", async (req, res) => {
       try {
         if (!sock) await startBot();
 
-        // ❗ muhiim: sug yar oo kaliya, ha sugin sock.user
+        // sug yar oo kaliya (fix pairing)
         await new Promise(r => setTimeout(r, 3000));
 
         code = await sock.requestPairingCode(number);
 
       } catch (err) {
-        console.log("PAIR ERROR:", err);
+        console.log(err);
         code = "❌ Try again";
       }
     } else {
