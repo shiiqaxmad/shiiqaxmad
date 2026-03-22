@@ -20,153 +20,174 @@ let isReady = false;
 
 // 🚀 START BOT
 async function startBot() {
-  if (isStarted) return;
-  isStarted = true;
+  try {
+    if (isStarted && sock) return;
+    isStarted = true;
 
-  const { state, saveCreds } = await useMultiFileAuthState("./session");
-  const { version } = await fetchLatestBaileysVersion();
+    const { state, saveCreds } = await useMultiFileAuthState("./session");
+    const { version } = await fetchLatestBaileysVersion();
 
-  sock = makeWASocket({
-    version,
-    logger: P({ level: "silent" }),
-    auth: state,
-    browser: Browsers.macOS("Shiiq Bot")
-  });
+    sock = makeWASocket({
+      version,
+      logger: P({ level: "silent" }),
+      auth: state,
+      browser: Browsers.macOS("Shiiq Bot")
+    });
 
-  sock.ev.on("creds.update", saveCreds);
+    sock.ev.on("creds.update", saveCreds);
 
-  sock.ev.on("connection.update", (update) => {
-    const { connection, lastDisconnect } = update;
+    sock.ev.on("connection.update", (update) => {
+      const { connection, lastDisconnect } = update;
 
-    if (connection === "open") {
-      console.log("✅ BOT READY");
-      isReady = true;
-    }
-
-    if (connection === "close") {
-      const code = lastDisconnect?.error?.output?.statusCode;
-      console.log("RECONNECTING...", code);
-
-      isReady = false;
-
-      if (code !== DisconnectReason.loggedOut) {
-        isStarted = false;
-        setTimeout(startBot, 5000);
+      if (connection === "open") {
+        console.log("✅ BOT READY");
+        isReady = true;
       }
-    }
-  });
 
-  // 👀 STATUS VIEW + REACT
-  sock.ev.on("messages.upsert", async ({ messages }) => {
-    const msg = messages[0];
-    if (!msg.message) return;
+      if (connection === "close") {
+        const code =
+          lastDisconnect?.error?.output?.statusCode ||
+          lastDisconnect?.error?.statusCode;
 
-    const from = msg.key.remoteJid;
+        console.log("❌ CLOSED:", code);
 
-    // STATUS (story)
-    if (from === "status@broadcast") {
-      const emojis = ["❤️","🔥","😂","😢","😍","⚡","💯","😎"];
+        isReady = false;
+        isStarted = false;
 
-      await sock.sendMessage(from, {
-        react: {
-          text: emojis[Math.floor(Math.random()*emojis.length)],
-          key: msg.key
+        if (code !== DisconnectReason.loggedOut) {
+          setTimeout(startBot, 5000);
         }
-      });
+      }
+    });
 
-      return; // stop here
-    }
+    // 💬 MESSAGES
+    sock.ev.on("messages.upsert", async ({ messages }) => {
+      try {
+        const msg = messages[0];
+        if (!msg.message) return;
 
-    // USER MESSAGES
-    const text =
-      msg.message.conversation ||
-      msg.message.extendedTextMessage?.text ||
-      "";
+        const from = msg.key.remoteJid;
 
-    const t = text.toLowerCase();
+        // 👀 STATUS VIEW + REACT
+        if (from === "status@broadcast") {
+          const emojis = ["❤️","🔥","😂","😢","😍","⚡","💯","😎"];
+          if (msg.key) {
+            await sock.sendMessage(from, {
+              react: {
+                text: emojis[Math.floor(Math.random()*emojis.length)],
+                key: msg.key
+              }
+            });
+          }
+          return;
+        }
 
-    if (!t.includes("shiiq bot")) return;
+        // 🧠 TEXT
+        const text =
+          msg.message?.conversation ||
+          msg.message?.extendedTextMessage?.text ||
+          msg.message?.imageMessage?.caption ||
+          msg.message?.videoMessage?.caption ||
+          "";
 
-    await new Promise(r => setTimeout(r, 500));
+        const t = text.toLowerCase();
 
-    // 👑 owner
-    if (t.includes("owner")) {
-      return sock.sendMessage(from, { text: "👑 Sheikh Axmad" });
-    }
+        if (!t.includes("shiiq")) return;
 
-    // 👋 salaam
-    if (t.includes("hi") || t.includes("salaam")) {
-      return sock.sendMessage(from, { text: "👋 Wcs bro" });
-    }
+        await new Promise(r => setTimeout(r, 500));
 
-    // 😂 joke
-    if (t.includes("joke")) {
-      const jokes = [
-        "😂 Bot baa yiri RAM iga buuxsamay!",
-        "🤣 Wiil baa yiri exam waan fududeynayaa!",
-        "😆 Noloshu waa meme!"
-      ];
-      return sock.sendMessage(from, { text: jokes[Math.floor(Math.random()*jokes.length)] });
-    }
+        // 👑 OWNER
+        if (t.includes("owner")) {
+          return sock.sendMessage(from, { text: "👑 Sheikh Axmad" });
+        }
 
-    // 📋 menu
-    if (t.includes("menu") || t.includes("help")) {
-      return sock.sendMessage(from, {
-        text: `
+        // 👋 SALAAM
+        if (t.includes("hi") || t.includes("salaam")) {
+          return sock.sendMessage(from, { text: "👋 Wcs bro" });
+        }
+
+        // 😂 JOKE
+        if (t.includes("joke")) {
+          const jokes = [
+            "😂 Bot baa yiri RAM iga buuxsamay!",
+            "🤣 Wiil baa yiri exam waan fududeynayaa!",
+            "😆 Noloshu waa meme!"
+          ];
+          return sock.sendMessage(from, {
+            text: jokes[Math.floor(Math.random()*jokes.length)]
+          });
+        }
+
+        // 📋 MENU
+        if (t.includes("menu") || t.includes("help")) {
+          return sock.sendMessage(from, {
+            text: `
 🤖 SHIIQ BOT MENU
 
-⚡ Basic: hi, owner  
-😂 Fun: joke  
-😢 Qiso: shiiq qisada 1-10  
-❤️ Geeraar: geeraar jacayl  
-
-🔥 Status: auto view + react  
+⚡ hi, owner  
+😂 joke  
+❤️ geeraar jacayl  
+😢 shiiq qisada 1-10  
+🔥 tiktok commands  
 
 Enjoy 😎
 `
-      });
-    }
+          });
+        }
 
-    // 😢 QISOYIN
-    if (t.includes("shiiq qisada")) {
+        // 😢 QISOYIN
+        if (t.includes("qisada")) {
+          return sock.sendMessage(from, { text: "😢 Qisooyin waa murugo bro..." });
+        }
 
-      if (t.includes("1")) return sock.sendMessage(from,{text:`😢 QISO 1\n\nWiil ayaa jeclaa gabar… laakiin lama qadarin…\n\n💔 dadka qaar waxay kaa maqnaan karaan adigoon jirin`});
-      if (t.includes("2")) return sock.sendMessage(from,{text:`😢 QISO 2\n\nGabar ayaa dooratay lacag… albaabku wuu xirnaa 😞`});
-      if (t.includes("3")) return sock.sendMessage(from,{text:`😢 QISO 3\n\nQof aamusan ma faraxsana 💔`});
-      if (t.includes("4")) return sock.sendMessage(from,{text:`😢 QISO 4\n\nHadal iyo ficil waa kala duwan 😢`});
-      if (t.includes("5")) return sock.sendMessage(from,{text:`😢 QISO 5\n\nCabsi ayaa dilta jacaylka 😔`});
-      if (t.includes("6")) return sock.sendMessage(from,{text:`😢 QISO 6\n\nQiimaha qofka waa la garan marka uu tago 😞`});
-      if (t.includes("7")) return sock.sendMessage(from,{text:`😢 QISO 7\n\nDhoola cadeyn ma farxad 💔`});
-      if (t.includes("8")) return sock.sendMessage(from,{text:`😢 QISO 8\n\nCiyaar jacayl dhaawac 😢`});
-      if (t.includes("9")) return sock.sendMessage(from,{text:`😢 QISO 9\n\nAamusnaantu waa jawaab 😔`});
-      if (t.includes("10")) return sock.sendMessage(from,{text:`😢 QISO 10\n\nDhammaadku waa aamusnaan 😞`});
-    }
+        // ❤️ GEERAAR
+        if (t.includes("geeraar")) {
+          return sock.sendMessage(from, {
+            text: `❤️ Adiga ayaan ku jeclahay,\nQof kale ma arko.\n\nMucaashaq Shiiq Axmad`
+          });
+        }
 
-    // ❤️ GEERAAR
-    if (t.includes("geeraar jacayl")) {
-      const geeraar = [
-`❤️ GEERAAR
+        // 💔 NEW COMMAND
+        if (t.includes("caawa maxaa kugu dhacay")) {
+          return sock.sendMessage(from, {
+            text: "💔 Waa qalbi jabsanahay..."
+          });
+        }
 
-Adiga ayaan ku jeclahay,
-Qof kale ma arko.
+        // 😂 TIKTOK FUN
+        if (t.includes("biyaha hoo")) {
+          return sock.sendMessage(from, { text: "War biyo marabee iga tag 😂" });
+        }
 
-Mucaashaq Shiiq Axmad`,
+        if (t.includes("lacag")) {
+          return sock.sendMessage(from, { text: "Lacag? xitaa data ma haysto 😭" });
+        }
 
-`❤️ GEERAAR
+        if (t.includes("imaaw")) {
+          return sock.sendMessage(from, { text: "Meel ma imaan karo wifi ayaan ahay 😎" });
+        }
 
-Indhahayga adaa iftiin,
-Nolosheyda adaa micno.
+        if (t.includes("seexo")) {
+          return sock.sendMessage(from, { text: "Adaa seexo aniga shaqo ayaan hayaa 😂" });
+        }
 
-Mucaashaq Shiiq Axmad`
-      ];
+        if (t.includes("yaa tahay")) {
+          return sock.sendMessage(from, {
+            text: "Anigu waxaan ahay Shiiq Bot 😎🔥 kii dadka wareeriya 😂"
+          });
+        }
 
-      return sock.sendMessage(from, {
-        text: geeraar[Math.floor(Math.random()*geeraar.length)]
-      });
-    }
+        return sock.sendMessage(from, { text: "😎 Waa Shiiq Bot" });
 
-    return sock.sendMessage(from, { text: "😎 Waa Shiiq Bot" });
-  });
+      } catch (err) {
+        console.log("MSG ERROR:", err);
+      }
+    });
+
+  } catch (err) {
+    console.log("START ERROR:", err);
+    isStarted = false;
+  }
 }
 
 // 🌐 UI
@@ -194,10 +215,12 @@ app.post("/pair", async (req, res) => {
   }
 
   try {
-    if (!sock) await startBot();
+    if (!sock || !isReady) {
+      await startBot();
+    }
 
     let tries = 0;
-    while (!isReady && tries < 20) {
+    while (!isReady && tries < 40) {
       await new Promise(r => setTimeout(r, 1000));
       tries++;
     }
@@ -208,13 +231,13 @@ app.post("/pair", async (req, res) => {
 
     res.send(`<h1 style="color:lime;text-align:center;">${code}</h1>`);
 
-  } catch {
+  } catch (err) {
     res.send("❌ Failed");
   }
 });
 
 // 🚀 SERVER
 app.listen(PORT, async () => {
-  console.log("RUNNING...");
+  console.log("🚀 RUNNING...");
   await startBot();
 });
