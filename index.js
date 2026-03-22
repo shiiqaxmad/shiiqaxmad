@@ -1,5 +1,4 @@
 const express = require("express");
-const QRCode = require("qrcode");
 const {
   default: makeWASocket,
   useMultiFileAuthState,
@@ -16,26 +15,13 @@ const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 
 let sock;
-let qrImage = null;
-
-// 🌐 HOME
-app.get("/", (req, res) => {
-  res.send(`
-  <html>
-  <body style="background:black;color:white;text-align:center;padding-top:100px;">
-    <h1>⚡ SHIIQ BOT ⚡</h1>
-
-    <a href="/pair"><button>PAIR</button></a>
-    <br><br>
-
-    <a href="/qr"><button>QR</button></a>
-  </body>
-  </html>
-  `);
-});
+let isStarted = false;
 
 // 🚀 START BOT
 async function startBot() {
+  if (isStarted) return;
+  isStarted = true;
+
   const { state, saveCreds } = await useMultiFileAuthState("./session");
   const { version } = await fetchLatestBaileysVersion();
 
@@ -48,26 +34,25 @@ async function startBot() {
 
   sock.ev.on("creds.update", saveCreds);
 
-  sock.ev.on("connection.update", async (update) => {
-    const { connection, qr } = update;
-
-    if (qr) {
-      qrImage = await QRCode.toDataURL(qr);
-      console.log("QR READY");
-    }
+  sock.ev.on("connection.update", (update) => {
+    const { connection, lastDisconnect } = update;
 
     if (connection === "open") {
       console.log("CONNECTED ✅");
-      qrImage = null;
     }
 
     if (connection === "close") {
-      console.log("RECONNECTING...");
-      setTimeout(startBot, 5000);
+      const code = lastDisconnect?.error?.output?.statusCode;
+      console.log("RECONNECTING...", code);
+
+      if (code !== DisconnectReason.loggedOut) {
+        isStarted = false;
+        setTimeout(startBot, 5000);
+      }
     }
   });
 
-  // 🤖 COMMANDS (SIDII AAD RABTAY - LAMA TAABAN)
+  // 🤖 COMMANDS (ALL IN ONE)
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message) return;
@@ -82,82 +67,132 @@ async function startBot() {
 
     if (!t.includes("shiiq bot")) return;
 
-    await new Promise(r => setTimeout(r, 700));
+    await new Promise(r => setTimeout(r, 500));
 
-    if (t.includes("yaa sameeyay") || t.includes("owner")) {
+    // 👑 owner
+    if (t.includes("owner")) {
       return sock.sendMessage(from, { text: "👑 Sheikh Axmad" });
     }
 
+    // ❤️ special
     if (t.includes("madaxey gangs mataqaan")) {
       return sock.sendMessage(from, { text: "❤️ Waa jacaylka Shiiq Axmad" });
     }
 
-    if (t.includes("salaamay") || t.includes("hi")) {
+    // 👋 salaam
+    if (t.includes("hi") || t.includes("salaam")) {
       return sock.sendMessage(from, { text: "👋 Wcs bro" });
     }
 
-    return sock.sendMessage(from, {
-      text: "😎 Haa waa aniga Shiiq Bot"
-    });
+    // 😂 joke
+    if (t.includes("joke")) {
+      const jokes = [
+        "😂 Wiil baa yiri bot i guurso… bot-na wuxuu yiri RAM ma haysto!",
+        "🤣 Macalin baa yiri 2+2=5 ardaydii waxay tiri sir baa jirta!",
+        "😆 Ninkii shaqo la'aan ahaa wuxuu noqday influencer!"
+      ];
+      return sock.sendMessage(from, { text: jokes[Math.floor(Math.random()*jokes.length)] });
+    }
+
+    // 🧠 time
+    if (t.includes("time")) {
+      return sock.sendMessage(from, { text: "🕒 " + new Date().toLocaleTimeString() });
+    }
+
+    // 📅 date
+    if (t.includes("date")) {
+      return sock.sendMessage(from, { text: "📅 " + new Date().toDateString() });
+    }
+
+    // 🔐 password
+    if (t.includes("password")) {
+      return sock.sendMessage(from, { text: "🔐 " + Math.random().toString(36).slice(-8) });
+    }
+
+    // 🏓 ping
+    if (t.includes("ping")) {
+      return sock.sendMessage(from, { text: "🏓 Pong! ⚡" });
+    }
+
+    // 😂 roast
+    if (t.includes("roast")) {
+      const roast = [
+        "😂 RAM-kaaga waa 2MB!",
+        "🤣 Maskaxdaadu update ayey rabtaa!",
+        "😆 Bot baa kaa caqli badan!"
+      ];
+      return sock.sendMessage(from, { text: roast[Math.floor(Math.random()*roast.length)] });
+    }
+
+    // 🎮 game
+    if (t.includes("ciyaar")) {
+      const games = ["🏆 Guul!", "💀 Khasaaro!", "😎 Mar kale!"];
+      return sock.sendMessage(from, { text: games[Math.floor(Math.random()*games.length)] });
+    }
+
+    // 📢 status
+    if (t.includes("status")) {
+      return sock.sendMessage(from, { text: "🟢 ONLINE 24/7 ⚡" });
+    }
+
+    // 📋 menu
+    if (t.includes("help") || t.includes("menu")) {
+      return sock.sendMessage(from, {
+        text: `
+🤖 SHIIQ BOT MENU
+
+⚡ Basic: hi, owner  
+😂 Fun: joke, roast  
+🧠 Smart: time, date  
+🔥 Pro: ping, password, ciyaar  
+
+Enjoy 😎
+`
+      });
+    }
+
+    // default
+    return sock.sendMessage(from, { text: "😎 Haa waa aniga Shiiq Bot" });
   });
 }
 
-// ⚡ PAIR (FIXED)
-app.all("/pair", async (req, res) => {
-  let number = req.body?.number || "";
-  let code = "";
-
-  if (number) {
-    number = number.replace(/[^0-9]/g, "");
-
-    if (number.startsWith("252")) {
-      try {
-        if (!sock) await startBot();
-
-        // sug yar oo kaliya (fix pairing)
-        await new Promise(r => setTimeout(r, 3000));
-
-        code = await sock.requestPairingCode(number);
-
-      } catch (err) {
-        console.log(err);
-        code = "❌ Try again";
-      }
-    } else {
-      code = "❌ Invalid number";
-    }
-  }
-
+// 🌐 UI (ERFAN STYLE)
+app.get("/", (req, res) => {
   res.send(`
   <html>
-  <body style="background:black;color:white;text-align:center;padding-top:100px;">
-    <h1>PAIR</h1>
+  <body style="background:#0d0d0d;color:white;text-align:center;padding-top:100px;font-family:sans-serif;">
+    <h2>⚡ SHIIQ PAIR ⚡</h2>
 
-    <form method="POST">
-      <input name="number" placeholder="25261xxxxxxx" required>
+    <form method="POST" action="/pair">
+      <input name="number" placeholder="25261xxxxxxx" style="padding:10px;border-radius:10px;border:none;">
       <br><br>
-      <button>GET CODE</button>
+      <button style="padding:10px 20px;border-radius:10px;background:#00ffcc;border:none;">GET CODE</button>
     </form>
-
-    ${code ? `<h2>${code}</h2>` : ""}
   </body>
   </html>
   `);
 });
 
-// 📷 QR
-app.get("/qr", async (req, res) => {
-  if (!sock) await startBot();
+// 🔑 PAIR
+app.post("/pair", async (req, res) => {
+  let number = req.body.number.replace(/[^0-9]/g, "");
 
-  let attempts = 0;
-  while (!qrImage && attempts < 20) {
-    await new Promise(r => setTimeout(r, 1000));
-    attempts++;
+  if (!number.startsWith("252")) {
+    return res.send("❌ Invalid number");
   }
 
-  if (!qrImage) return res.send("❌ QR not ready");
+  try {
+    if (!sock) await startBot();
 
-  res.send(`<img src="${qrImage}" width="250"/>`);
+    await new Promise(r => setTimeout(r, 3000));
+
+    const code = await sock.requestPairingCode(number);
+
+    res.send(`<h1 style="color:lime;text-align:center;">${code}</h1>`);
+
+  } catch {
+    res.send("❌ Try again");
+  }
 });
 
 // 🚀 SERVER
