@@ -23,18 +23,24 @@
 
 ---
 
-⚡ PAIRING ACCESS
+⚡ GET CODE (INSTANT)
 
 <p align="center">
 
 <a href="YOUR_LINK_HERE/pair">
-<img src="https://img.shields.io/badge/⚡ GET_CODE-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
+<img src="https://img.shields.io/badge/⚡ GET_CODE_NOW-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
 </a>
 
-<br><br>
+</p>
+
+---
+
+📷 QR LOGIN
+
+<p align="center">
 
 <a href="YOUR_LINK_HERE/qr">
-<img src="https://img.shields.io/badge/📷 SCAN_QR_CODE-00BFFF?style=for-the-badge&logo=whatsapp&logoColor=white"/>
+<img src="https://img.shields.io/badge/SCAN_QR_CODE-00BFFF?style=for-the-badge&logo=whatsapp&logoColor=white"/>
 </a>
 
 </p>
