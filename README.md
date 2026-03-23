@@ -23,19 +23,46 @@
 
 ---
 
+⚡ PAIRING ACCESS
+
 <p align="center">
 
-<img src="https://readme-typing-svg.herokuapp.com?color=00FF00&size=35&center=true&vCenter=true&width=600&lines=🏴+شيخ+أحمد" />
+<a href="YOUR_LINK_HERE/pair">
+<img src="https://img.shields.io/badge/⚡ GET_CODE-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
+</a>
 
 <br><br>
 
+<a href="YOUR_LINK_HERE/qr">
+<img src="https://img.shields.io/badge/📷 SCAN_QR_CODE-00BFFF?style=for-the-badge&logo=whatsapp&logoColor=white"/>
+</a>
+
+</p>
+
+---
+
+🚀 DEPLOY
+
+<p align="center">
+<img src="https://img.shields.io/badge/KOYEB-00ffcc?style=for-the-badge&logo=cloud&logoColor=black"/>
+</p>
+
+---
+
+<p align="center">
+
 <img src="https://i.ibb.co/8K9Z7yH/hacker-terminal.gif" width="350"/>
+
+<br><br>
+
+<img src="https://readme-typing-svg.herokuapp.com?color=00FF00&size=35&center=true&vCenter=true&width=600&lines=🏴+شيخ+أحمد" />
 
 </p>
 
 <p align="center">
 
 <img src="https://img.shields.io/badge/OWNER-شيخ_أحمد-00ff00?style=for-the-badge"/>
+<img src="https://img.shields.io/badge/NUMBER-252615810513-00ffcc?style=for-the-badge"/>
 <img src="https://img.shields.io/badge/BOT-SHIIQ_MD-00ffcc?style=for-the-badge"/>
 
 </p>
