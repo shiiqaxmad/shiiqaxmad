@@ -23,47 +23,20 @@
 
 ---
 
-⚡ QUICK ACCESS
-
 <p align="center">
 
-<a href="https://shiiqaxmad.onrender.com/pair">
-<img src="https://img.shields.io/badge/⚡ GET_PAIRING_CODE-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
-</a>
+<img src="https://readme-typing-svg.herokuapp.com?color=00FF00&size=35&center=true&vCenter=true&width=600&lines=🏴+شيخ+أحمد" />
 
 <br><br>
-
-<a href="https://shiiqaxmad.onrender.com/qr">
-<img src="https://img.shields.io/badge/📷 SCAN_QR_CODE-00BFFF?style=for-the-badge&logo=whatsapp&logoColor=white"/>
-</a>
-
-</p>
-
----
-
-🚀 DEPLOY OPTIONS
-
-<p align="center">
-
-<a href="https://www.koyeb.com">
-<img src="https://img.shields.io/badge/KOYEB-00ffcc?style=for-the-badge&logo=cloud&logoColor=black"/>
-</a>
-
-<br><br>
-
-<img src="https://img.shields.io/badge/NO_DEPLOYMENT_NEEDED-00ff00?style=for-the-badge&logo=vercel&logoColor=black"/>
-
-</p>
-
----
-
-<p align="center">
 
 <img src="https://i.ibb.co/8K9Z7yH/hacker-terminal.gif" width="350"/>
 
-<br><br>
+</p>
 
-<img src="https://readme-typing-svg.herokuapp.com?color=00FF00&size=30&center=true&vCenter=true&width=500&lines=Sheikh+Axmad+🏴;Elite+WhatsApp+Bot;Ultra+Pairing+System" />
+<p align="center">
+
+<img src="https://img.shields.io/badge/OWNER-شيخ_أحمد-00ff00?style=for-the-badge"/>
+<img src="https://img.shields.io/badge/BOT-SHIIQ_MD-00ffcc?style=for-the-badge"/>
 
 </p>
 
