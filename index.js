@@ -19,6 +19,12 @@ let sock;
 let isStarted = false;
 let isReady = false;
 
+// 🔗 ANTILINK
+let antiLink = false;
+
+// 👀 PRESENCE
+let presence = true;
+
 // 🚀 START BOT
 async function startBot() {
 try {
@@ -73,16 +79,89 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
 
     const t = text.toLowerCase();
 
+    // 🔗 ANTILINK AUTO
+    if (antiLink && isGroup) {
+      if (text.includes("chat.whatsapp.com") || text.includes("https://")) {
+
+        const sender = msg.key.participant || msg.key.remoteJid;
+        const group = await sock.groupMetadata(from);
+        const admins = group.participants.filter(p => p.admin).map(p => p.id);
+
+        if (admins.includes(sender)) return;
+
+        await sock.sendMessage(from,{
+          delete:{
+            remoteJid: from,
+            id: msg.key.id,
+            participant: sender
+          }
+        });
+
+        await sock.groupParticipantsUpdate(from, [sender], "remove");
+
+        return sock.sendMessage(from,{ text:"🚫 Link lama ogola!" });
+      }
+    }
+
     if (!t.startsWith(".")) return;
     const cmd = t.slice(1);
 
-    // 🎤 typing + recording
-    await sock.sendPresenceUpdate("composing", from);
-    await new Promise(r => setTimeout(r, 800));
-    await sock.sendPresenceUpdate("recording", from);
-    await new Promise(r => setTimeout(r, 800));
+    // 👀 PRESENCE
+    if (presence) {
+      await sock.sendPresenceUpdate("composing", from);
+      await new Promise(r => setTimeout(r, 800));
+      await sock.sendPresenceUpdate("recording", from);
+      await new Promise(r => setTimeout(r, 800));
+    }
 
-    // 🎧 VOICE COMMANDS
+    // 👀 PRESENCE CONTROL
+    if (cmd === "presence off") {
+      presence = false;
+      return sock.sendMessage(from,{ text:"🙈 Presence OFF" });
+    }
+
+    if (cmd === "presence on") {
+      presence = true;
+      return sock.sendMessage(from,{ text:"👀 Presence ON" });
+    }
+
+    // 🔗 ANTILINK COMMAND
+    if (cmd === "antilink on") {
+      antiLink = true;
+      return sock.sendMessage(from,{ text:"🔗 AntiLink ON" });
+    }
+
+    if (cmd === "antilink off") {
+      antiLink = false;
+      return sock.sendMessage(from,{ text:"🔗 AntiLink OFF" });
+    }
+
+    // 🔥 KICKALL
+    if (cmd === "kickall") {
+      if (!isGroup) return sock.sendMessage(from,{ text:"❌ Group only" });
+
+      const sender = msg.key.participant || msg.key.remoteJid;
+      const group = await sock.groupMetadata(from);
+
+      const admins = group.participants.filter(p => p.admin).map(p => p.id);
+
+      if (!admins.includes(sock.user.id)) {
+        return sock.sendMessage(from,{ text:"❌ Bot admin ma aha" });
+      }
+
+      if (!admins.includes(sender)) {
+        return sock.sendMessage(from,{ text:"❌ Adiga admin ma tihid" });
+      }
+
+      const members = group.participants.map(p => p.id);
+      const targets = members.filter(id => id !== sock.user.id);
+
+      await sock.groupParticipantsUpdate(from, targets, "remove");
+
+      return sock.sendMessage(from,{ text:"🔥 Group-ka dhan waa la nadiifiyay" });
+    }
+
+    // 🎧 VOICE
     if (cmd === "shiiq axmad maxaa rabtaa") {
       return sock.sendMessage(from,{
         audio: { url: "./AUD-20251226-WA0073.opus" },
@@ -156,29 +235,38 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{text:"🎲 "+Math.floor(Math.random()*100)});
     }
 
-    // 🎬 VV (reply video)
+    // 🎬 VV FULL
     if (cmd === "vv") {
-      if (!msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage)
-        return sock.sendMessage(from,{text:"Reply video ku samee .vv"});
 
-      const quoted = msg.message.extendedTextMessage.contextInfo;
-      const stream = await downloadContentFromMessage(
-        quoted.quotedMessage.videoMessage,
-        "video"
-      );
+      if (msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage) {
 
-      let buffer = Buffer.from([]);
-      for await (const chunk of stream) {
-        buffer = Buffer.concat([buffer, chunk]);
+        const quoted = msg.message.extendedTextMessage.contextInfo;
+
+        const stream = await downloadContentFromMessage(
+          quoted.quotedMessage.videoMessage,
+          "video"
+        );
+
+        let buffer = Buffer.from([]);
+        for await (const chunk of stream) {
+          buffer = Buffer.concat([buffer, chunk]);
+        }
+
+        return sock.sendMessage(from,{
+          video: buffer,
+          viewOnce: true,
+          caption:"+252615810513 developer"
+        });
       }
 
       return sock.sendMessage(from,{
-        video: buffer,
+        video: { url: "./vid.mp4" },
+        viewOnce: true,
         caption:"+252615810513 developer"
       });
     }
 
-    // 🖼️ IMG (reply image)
+    // 🖼️ IMG
     if (cmd === "img") {
       if (!msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage)
         return sock.sendMessage(from,{text:"Reply image ku samee .img"});
@@ -197,41 +285,10 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ image: buffer });
     }
 
-    // ❌ DELETE
-    if (cmd === "del") {
-      if (!isGroup) return sock.sendMessage(from,{text:"Group only"});
-      const key = msg.message.extendedTextMessage?.contextInfo?.stanzaId;
-      return sock.sendMessage(from,{ delete:{ remoteJid:from, id:key }});
-    }
-
-    // 👥 TAGALL
-    if (cmd === "tagall") {
-      if (!isGroup) return;
-      const group = await sock.groupMetadata(from);
-      let text = "👥 Tag All:\n";
-      let mentions = [];
-
-      group.participants.forEach(p => {
-        mentions.push(p.id);
-        text += "@"+p.id.split("@")[0]+"\n";
-      });
-
-      return sock.sendMessage(from,{ text, mentions });
-    }
-
-    // 👻 HIDETAG
-    if (cmd === "hidetag") {
-      if (!isGroup) return;
-      const group = await sock.groupMetadata(from);
-      const mentions = group.participants.map(p => p.id);
-      return sock.sendMessage(from,{ text:"👻 Hidden Tag", mentions });
-    }
-
     // 📋 MENU
     if (cmd === "menu" || cmd === "help") {
       return sock.sendMessage(from,{
         text:`
-
 🤖 SHIIQ BOT FULL
 
 ⚡ .hi
@@ -247,6 +304,11 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
 ❌ .del
 👥 .tagall
 👻 .hidetag
+
+🔗 .antilink on/off
+🔥 .kickall
+
+👀 .presence on/off
 
 ❤️ .madaxey
 😂 .shiiq hoo biyo
