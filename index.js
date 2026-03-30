@@ -292,15 +292,28 @@ return sock.sendMessage(from,{text:"😎 Unknown command"});
 app.get("/", (req,res)=>res.send("BOT RUNNING"));
 app.get("/status",(req,res)=>res.send(isConnected?"READY":"NOT READY"));
 
-// 🔑 PAIR PAGE
+// 🔥 NEW BEAUTIFUL PAIR PAGE
 app.get("/pair",(req,res)=>{
-res.send(`
+res.send(`<!DOCTYPE html>
 <html>
-<body style="background:#020617;color:white;text-align:center">
-<h2>SHIIQ BOT</h2>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHIIQ BOT</title>
+<style>
+body{display:flex;justify-content:center;align-items:center;height:100vh;background:#020617;color:white;font-family:sans-serif}
+.box{background:#0f172a;padding:30px;border-radius:15px;text-align:center;width:90%;max-width:400px;box-shadow:0 0 20px #22c55e}
+input{width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px}
+button{width:100%;padding:12px;margin-top:10px;background:#22c55e;border:none;border-radius:10px;color:white}
+#code{margin-top:15px;font-size:22px;color:#22c55e}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>🤖 SHIIQ BOT</h2>
 <input id="n" placeholder="25261xxxx">
-<button onclick="g()">PAIR</button>
+<button onclick="g()">GET CODE</button>
 <div id="c"></div>
+</div>
 <script>
 async function g(){
 let r=await fetch("/getcode?number="+n.value);
@@ -308,10 +321,10 @@ c.innerHTML=await r.text();
 }
 </script>
 </body>
-</html>
-`);
+</html>`);
 });
 
+// 🔑 GET CODE
 app.get("/getcode", async (req,res)=>{
 try{
 if(!sock||!isConnected) return res.send("❌ not ready");
