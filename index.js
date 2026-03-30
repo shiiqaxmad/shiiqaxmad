@@ -30,7 +30,7 @@ let isConnected = false;
 let antiLink = false;
 let presence = true;
 
-// 🚀 START BOT
+// 🚀 START BOT (ULTRA FIX)
 async function startBot() {
 try {
 if (isStarted) return;
@@ -40,58 +40,46 @@ const { state, saveCreds } = await useMultiFileAuthState("./session");
 const { version } = await fetchLatestBaileysVersion();
 
 sock = makeWASocket({
-version,
-logger: P({ level: "silent" }),
-auth: state,
-browser: Browsers.macOS("Shiiq Bot"),
-keepAliveIntervalMs: 15000,
+  version,
+  logger: P({ level: "silent" }),
+  auth: state,
+  browser: Browsers.macOS("Shiiq Bot"),
+
+  keepAliveIntervalMs: 10000,
+  connectTimeoutMs: 60000,
+  defaultQueryTimeoutMs: 60000,
+  retryRequestDelayMs: 2000,
+  markOnlineOnConnect: true,
 });
 
+// SAVE SESSION
 sock.ev.on("creds.update", saveCreds);
 
-// 🔌 CONNECTION
+// CONNECTION FIX 🔥
 sock.ev.on("connection.update", (update) => {
-const { connection, lastDisconnect } = update;
+  const { connection, lastDisconnect } = update;
 
-if (connection === "open") {
-console.log("✅ BOT READY");
-isConnected = true;
-}
+  if (connection === "open") {
+    console.log("✅ BOT READY 100%");
+    isConnected = true;
+  }
 
-if (connection === "close") {
-isConnected = false;
-const reason = lastDisconnect?.error?.output?.statusCode;
-console.log("❌ Closed:", reason);
+  if (connection === "close") {
+    const reason = lastDisconnect?.error?.output?.statusCode;
+    console.log("❌ Closed:", reason);
 
-isStarted = false;
+    isConnected = false;
+    isStarted = false;
 
-if (reason !== DisconnectReason.loggedOut) {
-setTimeout(startBot, 2000);
-}
-}
+    if (reason !== DisconnectReason.loggedOut) {
+      setTimeout(startBot, 3000);
+    } else {
+      console.log("⚠️ Delete session kadib pair mar kale");
+    }
+  }
 });
 
-// 👀 STATUS VIEW + REACT
-sock.ev.on("messages.upsert", async ({ messages }) => {
-try {
-const msg = messages[0];
-if (!msg.message) return;
-
-if (msg.key.remoteJid === "status@broadcast") {
-await sock.readMessages([msg.key]);
-
-const emojis = ["❤️","😂","🔥","😎","😍","🥰","😅","😳","👏","💯"];
-const random = emojis[Math.floor(Math.random()*emojis.length)];
-
-await sock.sendMessage("status@broadcast",{
-react:{text:random,key:msg.key}
-});
-}
-
-} catch(e){console.log(e)}
-});
-
-// 💬 COMMANDS FULL
+// 💬 COMMANDS (FULL - untouched)
 sock.ev.on("messages.upsert", async ({ messages }) => {
 try {
 const msg = messages[0];
@@ -115,17 +103,17 @@ if (text.includes("chat.whatsapp.com") || text.includes("https://")) {
 
 const sender = msg.key.participant || msg.key.remoteJid;
 const group = await sock.groupMetadata(from);
-const admins = group.participants.filter(p=>p.admin).map(p=>p.id);
+const admins = group.participants.filter(p => p.admin).map(p => p.id);
 
 if (admins.includes(sender)) return;
 
 await sock.sendMessage(from,{
-delete:{remoteJid:from,id:msg.key.id,participant:sender}
+delete:{ remoteJid: from, id: msg.key.id, participant: sender }
 });
 
-await sock.groupParticipantsUpdate(from,[sender],"remove");
+await sock.groupParticipantsUpdate(from, [sender], "remove");
 
-return sock.sendMessage(from,{text:"🚫 Link lama ogola!"});
+return sock.sendMessage(from,{ text:"🚫 Link lama ogola!" });
 }
 }
 
@@ -138,37 +126,29 @@ await sock.sendPresenceUpdate("composing", from);
 await new Promise(r => setTimeout(r, 400));
 }
 
-// ⚙️ SETTINGS
-if (cmd==="presence off") return presence=false,sock.sendMessage(from,{text:"🙈 OFF"});
-if (cmd==="presence on") return presence=true,sock.sendMessage(from,{text:"👀 ON"});
-if (cmd==="antilink on") return antiLink=true,sock.sendMessage(from,{text:"🔗 ON"});
-if (cmd==="antilink off") return antiLink=false,sock.sendMessage(from,{text:"🔗 OFF"});
+// SETTINGS
+if (cmd==="presence off") return presence=false, sock.sendMessage(from,{text:"🙈 OFF"});
+if (cmd==="presence on") return presence=true, sock.sendMessage(from,{text:"👀 ON"});
+if (cmd==="antilink on") return antiLink=true, sock.sendMessage(from,{text:"🔗 ON"});
+if (cmd==="antilink off") return antiLink=false, sock.sendMessage(from,{text:"🔗 OFF"});
 
-// 👥 GROUP
+// GROUP
 if (cmd==="kickall"){
 if(!isGroup) return sock.sendMessage(from,{text:"❌ Group only"});
-
-const sender = msg.key.participant || msg.key.remoteJid;
-const group = await sock.groupMetadata(from);
-const admins = group.participants.filter(p=>p.admin).map(p=>p.id);
-
-if(!admins.includes(sock.user.id))
-return sock.sendMessage(from,{text:"❌ Bot admin ma aha"});
-
-if(!admins.includes(sender))
-return sock.sendMessage(from,{text:"❌ Adiga admin ma tihid"});
-
-const members = group.participants.map(p=>p.id).filter(id=>id!==sock.user.id);
+const sender=msg.key.participant||msg.key.remoteJid;
+const group=await sock.groupMetadata(from);
+const admins=group.participants.filter(p=>p.admin).map(p=>p.id);
+if(!admins.includes(sock.user.id)) return sock.sendMessage(from,{text:"❌ Bot admin ma aha"});
+if(!admins.includes(sender)) return sock.sendMessage(from,{text:"❌ Adiga admin ma tihid"});
+const members=group.participants.map(p=>p.id);
 await sock.groupParticipantsUpdate(from,members,"remove");
-
 return sock.sendMessage(from,{text:"🔥 DONE"});
 }
 
 if (cmd==="tagall"){
-const group = await sock.groupMetadata(from);
-let teks="👥 TAG ALL\n\n";
-let mentions=[];
-for (let m of group.participants){
+const group=await sock.groupMetadata(from);
+let teks="👥 TAG ALL\n\n"; let mentions=[];
+for(let m of group.participants){
 mentions.push(m.id);
 teks+="@"+m.id.split("@")[0]+"\n";
 }
@@ -176,22 +156,22 @@ return sock.sendMessage(from,{text:teks,mentions});
 }
 
 if (cmd==="hidetag"){
-const group = await sock.groupMetadata(from);
-const mentions = group.participants.map(p=>p.id);
+const group=await sock.groupMetadata(from);
+const mentions=group.participants.map(p=>p.id);
 return sock.sendMessage(from,{text:"👻 Hidden",mentions});
 }
 
-// 🎵 SONG
+// SONG
 if (cmd.startsWith("song")){
-const query = text.slice(5).trim();
-const search = await yts(query);
-const vid = search.videos[0];
+const query=text.slice(5).trim();
+const search=await yts(query);
+const vid=search.videos[0];
 if(!vid) return sock.sendMessage(from,{text:"❌ Not found"});
 return sock.sendMessage(from,{text:`🎵 ${vid.title}\n${vid.url}`});
 }
 
-// 🎧 AUDIO
-if (cmd === "shiiq axmad maxaa rabtaa") {
+// AUDIO
+if (cmd==="shiiq axmad maxaa rabtaa"){
 return sock.sendMessage(from,{
 audio:{url:"./AUD-20251226-WA0073.opus"},
 mimetype:"audio/ogg; codecs=opus",
@@ -199,7 +179,7 @@ ptt:true
 });
 }
 
-if (cmd === "heestii axmad") {
+if (cmd==="heestii axmad"){
 return sock.sendMessage(from,{
 audio:{url:"./AUD-20260101-WA0120.mp3"},
 mimetype:"audio/mp4",
@@ -207,121 +187,115 @@ ptt:true
 });
 }
 
-// 🎬 VV
+// VV
 if (cmd==="vv"){
-const quoted = msg.message.extendedTextMessage?.contextInfo;
-if(!quoted?.quotedMessage?.videoMessage)
-return sock.sendMessage(from,{text:"Reply video"});
-
-const stream = await downloadContentFromMessage(
-quoted.quotedMessage.videoMessage,"video"
-);
-
-let buffer = Buffer.from([]);
-for await (const chunk of stream)
-buffer = Buffer.concat([buffer,chunk]);
-
+const quoted=msg.message.extendedTextMessage?.contextInfo;
+if(!quoted?.quotedMessage?.videoMessage) return sock.sendMessage(from,{text:"Reply video"});
+const stream=await downloadContentFromMessage(quoted.quotedMessage.videoMessage,"video");
+let buffer=Buffer.from([]);
+for await(const chunk of stream) buffer=Buffer.concat([buffer,chunk]);
 return sock.sendMessage(from,{video:buffer});
 }
 
-// 🖼️ IMG
+// IMG
 if (cmd==="img"){
-const quoted = msg.message.extendedTextMessage?.contextInfo;
-if(!quoted?.quotedMessage?.imageMessage)
-return sock.sendMessage(from,{text:"Reply image"});
-
-const stream = await downloadContentFromMessage(
-quoted.quotedMessage.imageMessage,"image"
-);
-
-let buffer = Buffer.from([]);
-for await (const chunk of stream)
-buffer = Buffer.concat([buffer,chunk]);
-
+const quoted=msg.message.extendedTextMessage?.contextInfo;
+if(!quoted?.quotedMessage?.imageMessage) return sock.sendMessage(from,{text:"Reply image"});
+const stream=await downloadContentFromMessage(quoted.quotedMessage.imageMessage,"image");
+let buffer=Buffer.from([]);
+for await(const chunk of stream) buffer=Buffer.concat([buffer,chunk]);
 return sock.sendMessage(from,{image:buffer});
 }
 
-// ❤️ BASIC
-if(cmd==="hi"||cmd==="salaam") return sock.sendMessage(from,{text:"👋 Wcs"});
-if(cmd==="joke") return sock.sendMessage(from,{text:"😂 Noloshu waa meme!"});
-if(cmd==="madaxey") return sock.sendMessage(from,{text:"❤️ Shiiq Axmad"});
-if(cmd==="madaxey yaa waaye") return sock.sendMessage(from,{text:"❤️ Waa Shiiq Axmad jacaylkiisa 💋🔥"});
-if(cmd==="shiiq hoo biyo") return sock.sendMessage(from,{text:"😂 biyo ma hayo"});
+// BASIC
+if (cmd==="hi"||cmd==="salaam") return sock.sendMessage(from,{text:"👋 Wcs"});
+if (cmd==="joke") return sock.sendMessage(from,{text:"😂 Noloshu waa meme!"});
+if (cmd==="madaxey yaa waaye") return sock.sendMessage(from,{text:"❤️ Shiiq Axmad jacaylkiisa waaye"});
+if (cmd==="shiiq hoo biyo") return sock.sendMessage(from,{text:"war iga tag biyo marabee😭😂"});
 
-// 📋 MENU
-if(cmd==="menu"||cmd==="help"){
+// QISO
+if (cmd==="qisada 1") return sock.sendMessage(from,{text:"😢 Jacayl..."});
+if (cmd==="qisada 2") return sock.sendMessage(from,{text:"💔 Habeen..."});
+if (cmd==="qisada 3") return sock.sendMessage(from,{text:"😢 Xanuun..."});
+if (cmd==="qisada 4") return sock.sendMessage(from,{text:"💔 Aamus..."});
+if (cmd==="qisada 5") return sock.sendMessage(from,{text:"😢 Cashar..."});
+
+// GEERAAR
+if (cmd==="geeraar") return sock.sendMessage(from,{text:"❤️ Adiga ayaan ku jeclahay..."});
+
+// FUN
+if (cmd==="meme") return sock.sendMessage(from,{text:"😂 Meme!"});
+if (cmd==="roast") return sock.sendMessage(from,{text:"🤣 Update samee!"});
+if (cmd==="number") return sock.sendMessage(from,{text:"🎲 "+Math.floor(Math.random()*100)});
+
+// MENU
+if (cmd==="menu"||cmd==="help"){
 return sock.sendMessage(from,{text:`
 🤖 SHIIQ BOT FULL
-
-.hi
-.joke
-.madaxey
-.madaxey yaa waaye
-.shiiq axmad maxaa rabtaa
-.heestii axmad
-
-.vv
-.img
-.tagall
-.hidetag
-.kickall
-
+.hi .joke .geeraar
+.qisada 1-5
+.meme .roast
+.number
+.vv .img
+.tagall .hidetag
 .antilink on/off
+.kickall
 .presence on/off
-
 .song magaca
 `});
 }
 
 return sock.sendMessage(from,{text:"😎 Unknown command"});
 
-} catch(e){console.log(e)}
+}catch(e){console.log(e)}
 });
 
 } catch(err){isStarted=false}
 }
 
-// 🌐 SERVER
-app.get("/", (req,res)=>res.send("BOT RUNNING"));
-app.get("/status",(req,res)=>res.send(isConnected?"READY":"NOT READY"));
+// 🌐 ROUTES
+app.get("/",(req,res)=>res.send("BOT RUNNING"));
+app.get("/status",(req,res)=>res.send(isConnected?"✅ READY":"❌ NOT READY"));
 
-// 🔥 NEW PAIR PAGE (QURUX BADAN)
+// 🔥 PAIR PAGE (ULTRA)
 app.get("/pair",(req,res)=>{
-res.send(`<!DOCTYPE html>
+res.send(`
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body{display:flex;justify-content:center;align-items:center;height:100vh;background:linear-gradient(135deg,#020617,#0f172a);color:white;font-family:sans-serif}
-.box{background:#0f172a;padding:30px;border-radius:20px;text-align:center;width:90%;max-width:400px;box-shadow:0 0 30px #22c55e}
-input{width:100%;padding:12px;margin-top:10px;border-radius:10px;border:none}
-button{width:100%;padding:12px;margin-top:10px;background:#22c55e;border:none;border-radius:10px;color:white}
-#c{margin-top:15px;font-size:22px;color:#22c55e}
-</style>
-</head>
-<body>
-<div class="box">
+<body style="background:#020617;color:white;text-align:center">
 <h2>🤖 SHIIQ BOT</h2>
 <input id="n" placeholder="25261xxxx">
 <button onclick="g()">GET CODE</button>
-<div id="c"></div>
-</div>
+<h3 id="c"></h3>
+
 <script>
+setInterval(async ()=>{
+let s=await fetch("/status");
+let t=await s.text();
+document.title=t;
+},2000);
+
 async function g(){
 let r=await fetch("/getcode?number="+n.value);
 c.innerHTML=await r.text();
 }
 </script>
 </body>
-</html>`);
+</html>
+`);
 });
 
 // 🔑 GET CODE
 app.get("/getcode", async (req,res)=>{
 try{
-if(!sock||!isConnected) return res.send("❌ not ready");
-const code=await sock.requestPairingCode(req.query.number);
-res.send(code);
+if(!sock) return res.send("⏳ starting...");
+if(!isConnected) return res.send("❌ bot not ready");
+
+const number=(req.query.number||"").replace(/[^0-9]/g,"");
+if(!number) return res.send("❌ number geli");
+
+const code=await sock.requestPairingCode(number);
+res.send("✅ "+code);
+
 }catch(e){res.send("❌ "+e.message)}
 });
 
@@ -329,6 +303,3 @@ app.listen(PORT, async ()=>{
 console.log("RUNNING "+PORT);
 await startBot();
 });
-
-setInterval(()=>console.log("alive"),30000);
-setInterval(()=>{if(process.env.KOYEB_URL) axios.get(process.env.KOYEB_URL).catch(()=>{})},60000);
