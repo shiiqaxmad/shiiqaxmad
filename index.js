@@ -9,9 +9,10 @@ downloadContentFromMessage
 } = require("@whiskeysockets/baileys");
 
 const P = require("pino");
+const yts = require("yt-search");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -161,6 +162,52 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ text:"🔥 Group-ka dhan waa la nadiifiyay" });
     }
 
+    // 👥 TAGALL
+    if (cmd === "tagall") {
+      if (!isGroup) return sock.sendMessage(from,{ text:"❌ Group only" });
+
+      const group = await sock.groupMetadata(from);
+      let teks = "👥 Tag All:\n\n";
+      let mentions = [];
+
+      for (let mem of group.participants) {
+        mentions.push(mem.id);
+        teks += "@" + mem.id.split("@")[0] + "\n";
+      }
+
+      return sock.sendMessage(from,{ text: teks, mentions });
+    }
+
+    // 👻 HIDETAG
+    if (cmd === "hidetag") {
+      if (!isGroup) return sock.sendMessage(from,{ text:"❌ Group only" });
+
+      const group = await sock.groupMetadata(from);
+      const mentions = group.participants.map(p => p.id);
+
+      return sock.sendMessage(from,{
+        text:"👻 Hidden Tag",
+        mentions
+      });
+    }
+
+    // 🎵 SONG
+    if (cmd.startsWith("song")) {
+      const query = text.slice(5).trim();
+      if (!query) {
+        return sock.sendMessage(from,{ text:"❗ Isticmaal: .song magaca heesta" });
+      }
+
+      const search = await yts(query);
+      const vid = search.videos[0];
+
+      if (!vid) return sock.sendMessage(from,{ text:"❌ Hees lama helin" });
+
+      return sock.sendMessage(from,{
+        text:`🎵 ${vid.title}\n\n🔗 ${vid.url}`
+      });
+    }
+
     // 🎧 VOICE
     if (cmd === "shiiq axmad maxaa rabtaa") {
       return sock.sendMessage(from,{
@@ -221,49 +268,37 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
 
     // 😂 meme
     if (cmd === "meme") {
-      return sock.sendMessage(from,{text:"😂 Noloshu waa meme!"});
+      return sock.sendMessage(from,{ text:"😂 Noloshu waa meme!" });
     }
 
     // 😈 roast
     if (cmd === "roast") {
       const roast = ["😂 WiFi kuma aqoonsado!","🤣 update samee!"];
-      return sock.sendMessage(from,{text:roast[Math.floor(Math.random()*roast.length)]});
+      return sock.sendMessage(from,{ text: roast[Math.floor(Math.random()*roast.length)] });
     }
 
     // 🎲 number
     if (cmd === "number") {
-      return sock.sendMessage(from,{text:"🎲 "+Math.floor(Math.random()*100)});
+      return sock.sendMessage(from,{ text:"🎲 " + Math.floor(Math.random()*100) });
     }
 
-    // 🎬 VV FULL
+    // 🎬 VV
     if (cmd === "vv") {
+      if (!msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage)
+        return sock.sendMessage(from,{text:"Reply video ku samee .vv"});
 
-      if (msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage) {
+      const quoted = msg.message.extendedTextMessage.contextInfo;
+      const stream = await downloadContentFromMessage(
+        quoted.quotedMessage.videoMessage,
+        "video"
+      );
 
-        const quoted = msg.message.extendedTextMessage.contextInfo;
-
-        const stream = await downloadContentFromMessage(
-          quoted.quotedMessage.videoMessage,
-          "video"
-        );
-
-        let buffer = Buffer.from([]);
-        for await (const chunk of stream) {
-          buffer = Buffer.concat([buffer, chunk]);
-        }
-
-        return sock.sendMessage(from,{
-          video: buffer,
-          viewOnce: true,
-          caption:"+252615810513 developer"
-        });
+      let buffer = Buffer.from([]);
+      for await (const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk]);
       }
 
-      return sock.sendMessage(from,{
-        video: { url: "./vid.mp4" },
-        viewOnce: true,
-        caption:"+252615810513 developer"
-      });
+      return sock.sendMessage(from,{ video: buffer });
     }
 
     // 🖼️ IMG
@@ -310,13 +345,15 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
 
 👀 .presence on/off
 
+🎵 .song magaca
+
 ❤️ .madaxey
 😂 .shiiq hoo biyo
 🎤 .shiiq axmad maxaa rabtaa
 🎶 .heestii axmad
 `
 });
-}
+    }
 
     return sock.sendMessage(from,{ text:"😎 Amar lama garanayo" });
 
@@ -333,6 +370,15 @@ isStarted = false;
 // 🌐 SERVER
 app.get("/", (req, res) => {
 res.send("BOT IS RUNNING");
+});
+
+// 🔑 PAIR
+app.get("/pair", async (req, res) => {
+  if (!sock) return res.send("Bot not ready");
+  const number = req.query.number;
+  if (!number) return res.send("Isticmaal: /pair?number=2526xxxx");
+  const code = await sock.requestPairingCode(number);
+  res.send("PAIR CODE: " + code);
 });
 
 app.listen(PORT, async () => {
