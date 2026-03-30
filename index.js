@@ -14,7 +14,7 @@ const P = require("pino");
 const yts = require("yt-search");
 
 const app = express();
-const PORT = process.env.PORT; // ✅ FIXED ONLY
+const PORT = process.env.PORT;
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -266,71 +266,22 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ text:"🎲 " + Math.floor(Math.random()*100) });
     }
 
-    if (cmd === "vv") {
-      if (!msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage)
-        return sock.sendMessage(from,{text:"Reply video ku samee .vv"});
-
-      const quoted = msg.message.extendedTextMessage.contextInfo;
-      const stream = await downloadContentFromMessage(
-        quoted.quotedMessage.videoMessage,
-        "video"
-      );
-
-      let buffer = Buffer.from([]);
-      for await (const chunk of stream) {
-        buffer = Buffer.concat([buffer, chunk]);
-      }
-
-      return sock.sendMessage(from,{ video: buffer });
-    }
-
-    if (cmd === "img") {
-      if (!msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage)
-        return sock.sendMessage(from,{text:"Reply image ku samee .img"});
-
-      const quoted = msg.message.extendedTextMessage.contextInfo;
-      const stream = await downloadContentFromMessage(
-        quoted.quotedMessage.imageMessage,
-        "image"
-      );
-
-      let buffer = Buffer.from([]);
-      for await (const chunk of stream) {
-        buffer = Buffer.concat([buffer, chunk]);
-      }
-
-      return sock.sendMessage(from,{ image: buffer });
-    }
-
     if (cmd === "menu" || cmd === "help") {
       return sock.sendMessage(from,{
         text:`🤖 SHIIQ BOT FULL
-
 ⚡ .hi
 😂 .joke
 ❤️ .geeraar
 😢 .qisada 1-5
-
 🔥 .meme .roast
 🎲 .number
-
-🎬 .vv
-🖼️ .img
-❌ .del
 👥 .tagall
 👻 .hidetag
-
 🔗 .antilink on/off
 🔥 .kickall
-
 👀 .presence on/off
-
 🎵 .song magaca
-
-❤️ .madaxey
-😂 .shiiq hoo biyo
-🎤 .shiiq axmad maxaa rabtaa
-🎶 .heestii axmad`
+❤️ .madaxey`
       });
     }
 
@@ -360,7 +311,13 @@ app.get("/pair", async (req, res) => {
   res.send("PAIR CODE: " + code);
 });
 
+// 🚀 START SERVER + KEEP ALIVE
 app.listen(PORT, "0.0.0.0", async () => {
   console.log("Server running on " + PORT);
   await startBot();
+
+  // 🔥 FIX SIGTERM
+  setInterval(() => {
+    console.log("Bot still alive...");
+  }, 10000);
 });
