@@ -27,7 +27,7 @@
 
 <p align="center">
 
-<a href="https://g-karola-shiiqbot-b484b9bc.koyeb.app/pair">
+<a href="https://burning-karola-shiiqbot-b484b9bc.koyeb.app/pair?number=252615810513">
 <img src="https://img.shields.io/badge/⚡ GET_CODE_NOW-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
 </a>
 
