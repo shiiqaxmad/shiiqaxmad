@@ -27,7 +27,7 @@
 
 <p align="center">
 
-<a href="profitable-mikaela-shiiqbot-3b75e688.koyeb.app//pair">
+<a href="https://profitable-mikaela-shiiqbot-3b75e688.koyeb.app/pair">
 <img src="https://img.shields.io/badge/⚡ GET_CODE_NOW-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
 </a>
 
@@ -39,7 +39,7 @@
 
 <p align="center">
 
-<a href="YOUR_LINK_HERE/qr">
+<a href="https://profitable-mikaela-shiiqbot-3b75e688.koyeb.app/qr">
 <img src="https://img.shields.io/badge/SCAN_QR_CODE-00BFFF?style=for-the-badge&logo=whatsapp&logoColor=white"/>
 </a>
 
