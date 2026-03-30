@@ -29,8 +29,6 @@ let isConnected = false;
 
 let antiLink = false;
 let presence = true;
-let recording = false;
-let typing = true;
 
 // 🚀 START BOT
 async function startBot() {
@@ -93,7 +91,7 @@ react:{text:random,key:msg.key}
 } catch(e){console.log(e)}
 });
 
-// 💬 COMMANDS
+// 💬 COMMANDS FULL
 sock.ev.on("messages.upsert", async ({ messages }) => {
 try {
 const msg = messages[0];
@@ -136,8 +134,8 @@ const cmd = t.slice(1);
 
 // 👀 PRESENCE
 if (presence) {
-if (typing) await sock.sendPresenceUpdate("composing", from);
-if (recording) await sock.sendPresenceUpdate("recording", from);
+await sock.sendPresenceUpdate("composing", from);
+await new Promise(r => setTimeout(r, 400));
 }
 
 // ⚙️ SETTINGS
@@ -145,10 +143,6 @@ if (cmd==="presence off") return presence=false,sock.sendMessage(from,{text:"�
 if (cmd==="presence on") return presence=true,sock.sendMessage(from,{text:"👀 ON"});
 if (cmd==="antilink on") return antiLink=true,sock.sendMessage(from,{text:"🔗 ON"});
 if (cmd==="antilink off") return antiLink=false,sock.sendMessage(from,{text:"🔗 OFF"});
-if (cmd==="typing on") return typing=true,sock.sendMessage(from,{text:"✍️ ON"});
-if (cmd==="typing off") return typing=false,sock.sendMessage(from,{text:"✍️ OFF"});
-if (cmd==="recording on") return recording=true,sock.sendMessage(from,{text:"🎙️ ON"});
-if (cmd==="recording off") return recording=false,sock.sendMessage(from,{text:"🎙️ OFF"});
 
 // 👥 GROUP
 if (cmd==="kickall"){
@@ -196,6 +190,23 @@ if(!vid) return sock.sendMessage(from,{text:"❌ Not found"});
 return sock.sendMessage(from,{text:`🎵 ${vid.title}\n${vid.url}`});
 }
 
+// 🎧 AUDIO
+if (cmd === "shiiq axmad maxaa rabtaa") {
+return sock.sendMessage(from,{
+audio:{url:"./AUD-20251226-WA0073.opus"},
+mimetype:"audio/ogg; codecs=opus",
+ptt:true
+});
+}
+
+if (cmd === "heestii axmad") {
+return sock.sendMessage(from,{
+audio:{url:"./AUD-20260101-WA0120.mp3"},
+mimetype:"audio/mp4",
+ptt:true
+});
+}
+
 // 🎬 VV
 if (cmd==="vv"){
 const quoted = msg.message.extendedTextMessage?.contextInfo;
@@ -230,33 +241,17 @@ buffer = Buffer.concat([buffer,chunk]);
 return sock.sendMessage(from,{image:buffer});
 }
 
-// ❤️ BASIC + AUDIO
-if(cmd==="hi"||cmd==="salaam") return sock.sendMessage(from,{text:"👋 Wcs bro"});
+// ❤️ BASIC
+if(cmd==="hi"||cmd==="salaam") return sock.sendMessage(from,{text:"👋 Wcs"});
 if(cmd==="joke") return sock.sendMessage(from,{text:"😂 Noloshu waa meme!"});
 if(cmd==="madaxey") return sock.sendMessage(from,{text:"❤️ Shiiq Axmad"});
 if(cmd==="madaxey yaa waaye") return sock.sendMessage(from,{text:"❤️ Waa Shiiq Axmad jacaylkiisa 💋🔥"});
 if(cmd==="shiiq hoo biyo") return sock.sendMessage(from,{text:"😂 biyo ma hayo"});
 
-if(cmd==="shiiq axmad maxaa rabtaa"){
-return sock.sendMessage(from,{
-audio:{url:"./AUD-20251226-WA0073.opus"},
-mimetype:"audio/ogg; codecs=opus",
-ptt:true
-});
-}
-
-if(cmd==="heestii axmad"){
-return sock.sendMessage(from,{
-audio:{url:"./AUD-20260101-WA0120.mp3"},
-mimetype:"audio/mp4",
-ptt:true
-});
-}
-
 // 📋 MENU
 if(cmd==="menu"||cmd==="help"){
 return sock.sendMessage(from,{text:`
-🤖 SHIIQ BOT FULL 🔥
+🤖 SHIIQ BOT FULL
 
 .hi
 .joke
@@ -273,8 +268,6 @@ return sock.sendMessage(from,{text:`
 
 .antilink on/off
 .presence on/off
-.typing on/off
-.recording on/off
 
 .song magaca
 `});
@@ -292,19 +285,18 @@ return sock.sendMessage(from,{text:"😎 Unknown command"});
 app.get("/", (req,res)=>res.send("BOT RUNNING"));
 app.get("/status",(req,res)=>res.send(isConnected?"READY":"NOT READY"));
 
-// 🔥 NEW BEAUTIFUL PAIR PAGE
+// 🔥 NEW PAIR PAGE (QURUX BADAN)
 app.get("/pair",(req,res)=>{
 res.send(`<!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHIIQ BOT</title>
 <style>
-body{display:flex;justify-content:center;align-items:center;height:100vh;background:#020617;color:white;font-family:sans-serif}
-.box{background:#0f172a;padding:30px;border-radius:15px;text-align:center;width:90%;max-width:400px;box-shadow:0 0 20px #22c55e}
-input{width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px}
+body{display:flex;justify-content:center;align-items:center;height:100vh;background:linear-gradient(135deg,#020617,#0f172a);color:white;font-family:sans-serif}
+.box{background:#0f172a;padding:30px;border-radius:20px;text-align:center;width:90%;max-width:400px;box-shadow:0 0 30px #22c55e}
+input{width:100%;padding:12px;margin-top:10px;border-radius:10px;border:none}
 button{width:100%;padding:12px;margin-top:10px;background:#22c55e;border:none;border-radius:10px;color:white}
-#code{margin-top:15px;font-size:22px;color:#22c55e}
+#c{margin-top:15px;font-size:22px;color:#22c55e}
 </style>
 </head>
 <body>
