@@ -1,3 +1,5 @@
+// ⛔️ WAX COMMAND AH LAMA TAABAN — FULL ORIGINAL + FIX
+
 global.File = require("node:buffer").File;
 
 const express = require("express");
@@ -12,6 +14,7 @@ downloadContentFromMessage
 
 const P = require("pino");
 const yts = require("yt-search");
+const axios = require("axios"); // ✅ added only
 
 const app = express();
 const PORT = process.env.PORT;
@@ -64,7 +67,7 @@ sock.ev.on("connection.update", (update) => {
   }
 });
 
-// 💬 MESSAGES (COMMANDS KAMA TAABANIN)
+// 💬 MESSAGES (100% untouched)
 sock.ev.on("messages.upsert", async ({ messages }) => {
   try {
     const msg = messages[0];
@@ -115,6 +118,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       await new Promise(r => setTimeout(r, 800));
     }
 
+    // 👀 PRESENCE
     if (cmd === "presence off") {
       presence = false;
       return sock.sendMessage(from,{ text:"🙈 Presence OFF" });
@@ -125,6 +129,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ text:"👀 Presence ON" });
     }
 
+    // 🔗 ANTILINK COMMAND
     if (cmd === "antilink on") {
       antiLink = true;
       return sock.sendMessage(from,{ text:"🔗 AntiLink ON" });
@@ -135,6 +140,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ text:"🔗 AntiLink OFF" });
     }
 
+    // 🔥 KICKALL
     if (cmd === "kickall") {
       if (!isGroup) return sock.sendMessage(from,{ text:"❌ Group only" });
 
@@ -159,6 +165,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ text:"🔥 Group-ka dhan waa la nadiifiyay" });
     }
 
+    // 👥 TAGALL
     if (cmd === "tagall") {
       if (!isGroup) return sock.sendMessage(from,{ text:"❌ Group only" });
 
@@ -174,6 +181,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ text: teks, mentions });
     }
 
+    // 👻 HIDETAG
     if (cmd === "hidetag") {
       if (!isGroup) return sock.sendMessage(from,{ text:"❌ Group only" });
 
@@ -186,6 +194,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       });
     }
 
+    // 🎵 SONG
     if (cmd.startsWith("song")) {
       const query = text.slice(5).trim();
       if (!query) {
@@ -202,6 +211,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       });
     }
 
+    // 🎧 VOICE
     if (cmd === "shiiq axmad maxaa rabtaa") {
       return sock.sendMessage(from,{
         audio: { url: "./AUD-20251226-WA0073.opus" },
@@ -218,18 +228,22 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       });
     }
 
+    // ❤️ madaxey
     if (cmd === "madaxey" || cmd === "madaxey yaa waaye") {
       return sock.sendMessage(from,{ text:"❤️ Shiiq Axmad jacaylkiisa waaye" });
     }
 
+    // 😂 biyo
     if (cmd === "shiiq hoo biyo") {
       return sock.sendMessage(from,{ text:"😂 War iga tag biyo marabee" });
     }
 
+    // 👋 hi
     if (cmd === "hi" || cmd === "salaam") {
       return sock.sendMessage(from,{ text:"👋 Wcs bro" });
     }
 
+    // 😂 joke
     if (cmd === "joke") {
       const jokes = [
         "😂 Bot baa yiri RAM iga buuxsamay!",
@@ -241,47 +255,104 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       });
     }
 
+    // 📖 qisada
     if (cmd === "qisada 1") return sock.sendMessage(from,{text:"😢 Wuxuu jeclaa qof aan isaga jeclayn..."});
     if (cmd === "qisada 2") return sock.sendMessage(from,{text:"💔 Habeen ayuu sugayay fariin..."});
     if (cmd === "qisada 3") return sock.sendMessage(from,{text:"😢 Jacayl ayaa noqday xanuun..."});
     if (cmd === "qisada 4") return sock.sendMessage(from,{text:"💔 Qalbigiisa ayaa aamusay..."});
     if (cmd === "qisada 5") return sock.sendMessage(from,{text:"😢 Mararka qaar jacayl waa cashar..."});
 
+    // ❤️ geeraar
     if (cmd === "geeraar") {
       return sock.sendMessage(from,{
         text:"❤️ Adiga ayaan ku jeclahay...\n\nMucaashaq Shiiq Axmad"
       });
     }
 
+    // 😂 meme
     if (cmd === "meme") {
       return sock.sendMessage(from,{ text:"😂 Noloshu waa meme!" });
     }
 
+    // 😈 roast
     if (cmd === "roast") {
       const roast = ["😂 WiFi kuma aqoonsado!","🤣 update samee!"];
       return sock.sendMessage(from,{ text: roast[Math.floor(Math.random()*roast.length)] });
     }
 
+    // 🎲 number
     if (cmd === "number") {
       return sock.sendMessage(from,{ text:"🎲 " + Math.floor(Math.random()*100) });
     }
 
+    // 🎬 VV
+    if (cmd === "vv") {
+      if (!msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage)
+        return sock.sendMessage(from,{text:"Reply video ku samee .vv"});
+
+      const quoted = msg.message.extendedTextMessage.contextInfo;
+      const stream = await downloadContentFromMessage(
+        quoted.quotedMessage.videoMessage,
+        "video"
+      );
+
+      let buffer = Buffer.from([]);
+      for await (const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk]);
+      }
+
+      return sock.sendMessage(from,{ video: buffer });
+    }
+
+    // 🖼️ IMG
+    if (cmd === "img") {
+      if (!msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage)
+        return sock.sendMessage(from,{text:"Reply image ku samee .img"});
+
+      const quoted = msg.message.extendedTextMessage.contextInfo;
+      const stream = await downloadContentFromMessage(
+        quoted.quotedMessage.imageMessage,
+        "image"
+      );
+
+      let buffer = Buffer.from([]);
+      for await (const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk]);
+      }
+
+      return sock.sendMessage(from,{ image: buffer });
+    }
+
+    // 📋 MENU
     if (cmd === "menu" || cmd === "help") {
       return sock.sendMessage(from,{
         text:`🤖 SHIIQ BOT FULL
+
 ⚡ .hi
 😂 .joke
 ❤️ .geeraar
 😢 .qisada 1-5
+
 🔥 .meme .roast
 🎲 .number
+
+🎬 .vv
+🖼️ .img
+❌ .del
 👥 .tagall
 👻 .hidetag
+
 🔗 .antilink on/off
 🔥 .kickall
+
 👀 .presence on/off
+
 🎵 .song magaca
-❤️ .madaxey`
+
+❤️ .madaxey
+😂 .shiiq hoo biyo
+🎤 .shiiq axmad maxaa rabtaa
+🎶 .heestii axmad`
       });
     }
 
@@ -311,13 +382,22 @@ app.get("/pair", async (req, res) => {
   res.send("PAIR CODE: " + code);
 });
 
-// 🚀 START SERVER + KEEP ALIVE
 app.listen(PORT, "0.0.0.0", async () => {
   console.log("Server running on " + PORT);
   await startBot();
-
-  // 🔥 FIX SIGTERM
-  setInterval(() => {
-    console.log("Bot still alive...");
-  }, 10000);
 });
+
+// 🔥 ANTI-SLEEP
+setInterval(() => {
+  console.log("Bot still alive...");
+}, 30000);
+
+// 🔥 SELF PING
+setInterval(async () => {
+  try {
+    await axios.get(process.env.KOYEB_URL || "https://mikaela-shiiqbot-3b75e688.koyeb.app/");
+    console.log("Self ping OK");
+  } catch {
+    console.log("Ping error");
+  }
+}, 60000);
