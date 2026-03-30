@@ -1,6 +1,13 @@
 global.crypto = require("node:crypto").webcrypto;
 global.File = require("node:buffer").File;
 
+process.on("uncaughtException", (err) => {
+  console.log("❌ Crash:", err.message);
+});
+process.on("unhandledRejection", (err) => {
+  console.log("❌ Promise:", err);
+});
+
 const express = require("express");
 const {
 default: makeWASocket,
@@ -29,7 +36,7 @@ let antiLink = false;
 // 👀 PRESENCE
 let presence = true;
 
-// 🚀 START BOT
+// 🚀 START BOT (PRO)
 async function startBot() {
 try {
 if (isStarted) return;
@@ -43,6 +50,9 @@ sock = makeWASocket({
   logger: P({ level: "silent" }),
   auth: state,
   browser: Browsers.macOS("Shiiq Bot"),
+  keepAliveIntervalMs: 20000,
+  connectTimeoutMs: 60000,
+  defaultQueryTimeoutMs: 60000,
 });
 
 sock.ev.on("creds.update", saveCreds);
@@ -51,18 +61,24 @@ sock.ev.on("connection.update", (update) => {
   const { connection, lastDisconnect } = update;
 
   if (connection === "open") {
-    console.log("✅ BOT READY");
+    console.log("✅ BOT READY 24/7");
   }
 
   if (connection === "close") {
+    const reason = lastDisconnect?.error?.output?.statusCode;
+    console.log("❌ Closed:", reason);
+
     isStarted = false;
-    if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-      setTimeout(startBot, 4000);
+
+    if (reason !== DisconnectReason.loggedOut) {
+      setTimeout(() => startBot(), 2000);
+    } else {
+      console.log("⚠️ Delete session kadib pair mar kale");
     }
   }
 });
 
-// 💬 COMMANDS (FULL – NOTHING REMOVED)
+// 💬 COMMANDS (FULL)
 sock.ev.on("messages.upsert", async ({ messages }) => {
   try {
     const msg = messages[0];
@@ -370,7 +386,6 @@ let r=await fetch("/getcode?number="+n);
 let t=await r.text();
 document.getElementById("code").innerHTML=t;
 navigator.clipboard.writeText(t);
-window.open("https://wa.me/"+n+"?text=PAIR CODE: "+t);
 }
 </script>
 </body>
@@ -382,10 +397,16 @@ window.open("https://wa.me/"+n+"?text=PAIR CODE: "+t);
 app.get("/getcode", async (req, res) => {
 try {
 if (!sock) return res.send("⏳ Bot starting...");
-const code = await sock.requestPairingCode(req.query.number);
-res.send(code);
+if (!sock.user) return res.send("❌ Bot not ready. Sug...");
+
+const number = (req.query.number || "").replace(/[^0-9]/g, "");
+if (!number) return res.send("❌ Number geli");
+
+const code = await sock.requestPairingCode(number);
+res.send("✅ CODE: " + code);
+
 } catch (e) {
-res.send("Error: " + e.message);
+res.send("❌ Error: " + e.message);
 }
 });
 
@@ -400,8 +421,10 @@ setInterval(() => console.log("Bot still alive..."), 30000);
 // 🔥 SELF PING
 setInterval(async () => {
 try {
+if (process.env.KOYEB_URL) {
 await axios.get(process.env.KOYEB_URL);
 console.log("Self ping OK");
+}
 } catch {
 console.log("Ping error");
 }
