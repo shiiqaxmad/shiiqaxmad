@@ -14,7 +14,7 @@ const P = require("pino");
 const yts = require("yt-search");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT; // ✅ FIXED ONLY
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -351,7 +351,7 @@ app.get("/", (req, res) => {
 res.send("BOT IS RUNNING");
 });
 
-// 🔑 PAIR (FIXED ONLY)
+// 🔑 PAIR
 app.get("/pair", async (req, res) => {
   if (!sock) return res.send("Bot starting...");
   const number = req.query.number;
