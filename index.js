@@ -1,6 +1,6 @@
 global.crypto = require("node:crypto").webcrypto;
-
 global.File = require("node:buffer").File;
+
 const express = require("express");
 const {
 default: makeWASocket,
@@ -62,7 +62,7 @@ sock.ev.on("connection.update", (update) => {
   }
 });
 
-// 💬 COMMANDS (FULL)
+// 💬 COMMANDS (FULL – NOTHING REMOVED)
 sock.ev.on("messages.upsert", async ({ messages }) => {
   try {
     const msg = messages[0];
@@ -80,7 +80,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
 
     const t = text.toLowerCase();
 
-    // 🔗 ANTILINK SYSTEM
+    // 🔗 ANTILINK
     if (antiLink && isGroup) {
       if (text.includes("chat.whatsapp.com") || text.includes("https://")) {
 
@@ -113,7 +113,6 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       await new Promise(r => setTimeout(r, 500));
     }
 
-    // PRESENCE
     if (cmd === "presence off") {
       presence = false;
       return sock.sendMessage(from,{ text:"🙈 Presence OFF" });
@@ -124,7 +123,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ text:"👀 Presence ON" });
     }
 
-    // ANTILINK
+    // 🔗 ANTILINK COMMAND
     if (cmd === "antilink on") {
       antiLink = true;
       return sock.sendMessage(from,{ text:"🔗 AntiLink ON" });
@@ -135,7 +134,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ text:"🔗 AntiLink OFF" });
     }
 
-    // KICKALL
+    // 🔥 KICKALL
     if (cmd === "kickall") {
       if (!isGroup) return sock.sendMessage(from,{ text:"❌ Group only" });
 
@@ -156,7 +155,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ text:"🔥 Group la nadiifiyay" });
     }
 
-    // TAGALL
+    // 👥 TAGALL
     if (cmd === "tagall") {
       const group = await sock.groupMetadata(from);
       let teks = "👥 Tag All:\n\n";
@@ -170,7 +169,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ text: teks, mentions });
     }
 
-    // HIDETAG
+    // 👻 HIDETAG
     if (cmd === "hidetag") {
       const group = await sock.groupMetadata(from);
       const mentions = group.participants.map(p => p.id);
@@ -181,9 +180,11 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       });
     }
 
-    // SONG
+    // 🎵 SONG
     if (cmd.startsWith("song")) {
       const query = text.slice(5).trim();
+      if (!query) return sock.sendMessage(from,{ text:"❗ Isticmaal: .song magaca" });
+
       const search = await yts(query);
       const vid = search.videos[0];
 
@@ -194,7 +195,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       });
     }
 
-    // VOICE
+    // 🎧 AUDIO
     if (cmd === "shiiq axmad maxaa rabtaa") {
       return sock.sendMessage(from,{
         audio: { url: "./AUD-20251226-WA0073.opus" },
@@ -211,7 +212,7 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       });
     }
 
-    // BASIC
+    // ❤️ BASIC
     if (cmd === "madaxey" || cmd === "madaxey yaa waaye")
       return sock.sendMessage(from,{ text:"❤️ Shiiq Axmad jacayl" });
 
@@ -221,36 +222,46 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
     if (cmd === "hi" || cmd === "salaam")
       return sock.sendMessage(from,{ text:"👋 Wcs bro" });
 
-    if (cmd === "joke")
+    if (cmd === "joke") {
+      const jokes = [
+        "😂 Bot baa yiri RAM iga buuxsamay!",
+        "🤣 Wiil baa yiri exam waan fududeynayaa!",
+        "😆 Noloshu waa meme!"
+      ];
+      return sock.sendMessage(from,{
+        text:jokes[Math.floor(Math.random()*jokes.length)]
+      });
+    }
+
+    // 📖 QISADA
+    if (cmd === "qisada 1") return sock.sendMessage(from,{text:"😢 Wuxuu jeclaa qof aan isaga jeclayn..."});
+    if (cmd === "qisada 2") return sock.sendMessage(from,{text:"💔 Habeen ayuu sugayay fariin..."});
+    if (cmd === "qisada 3") return sock.sendMessage(from,{text:"😢 Jacayl ayaa noqday xanuun..."});
+    if (cmd === "qisada 4") return sock.sendMessage(from,{text:"💔 Qalbigiisa ayaa aamusay..."});
+    if (cmd === "qisada 5") return sock.sendMessage(from,{text:"😢 Mararka qaar jacayl waa cashar..."});
+
+    // ❤️ GEERAAR
+    if (cmd === "geeraar")
+      return sock.sendMessage(from,{ text:"❤️ Adiga ayaan ku jeclahay...\n\nMucaashaq Shiiq Axmad" });
+
+    // 😂 MEME / ROAST
+    if (cmd === "meme")
       return sock.sendMessage(from,{ text:"😂 Noloshu waa meme!" });
 
-    // QISADA
-    if (cmd === "qisada 1") return sock.sendMessage(from,{text:"😢 Jacayl..."});
-    if (cmd === "qisada 2") return sock.sendMessage(from,{text:"💔 Habeen..."});
-    if (cmd === "qisada 3") return sock.sendMessage(from,{text:"😢 Xanuun..."});
-    if (cmd === "qisada 4") return sock.sendMessage(from,{text:"💔 Aamus..."});
-    if (cmd === "qisada 5") return sock.sendMessage(from,{text:"😢 Cashar..."});
+    if (cmd === "roast") {
+      const roast = ["😂 WiFi kuma aqoonsado!","🤣 update samee!"];
+      return sock.sendMessage(from,{ text: roast[Math.floor(Math.random()*roast.length)] });
+    }
 
-    // GEERAAR
-    if (cmd === "geeraar")
-      return sock.sendMessage(from,{ text:"❤️ Adiga ayaan ku jeclahay..." });
-
-    // MEME / ROAST
-    if (cmd === "meme")
-      return sock.sendMessage(from,{ text:"😂 Meme!" });
-
-    if (cmd === "roast")
-      return sock.sendMessage(from,{ text:"🤣 Update samee!" });
-
-    // NUMBER
+    // 🎲 NUMBER
     if (cmd === "number")
       return sock.sendMessage(from,{ text:"🎲 " + Math.floor(Math.random()*100) });
 
-    // VV
+    // 🎬 VV
     if (cmd === "vv") {
       const quoted = msg.message.extendedTextMessage?.contextInfo;
       if (!quoted?.quotedMessage?.videoMessage)
-        return sock.sendMessage(from,{ text:"Reply video" });
+        return sock.sendMessage(from,{ text:"Reply video ku samee .vv" });
 
       const stream = await downloadContentFromMessage(
         quoted.quotedMessage.videoMessage,"video"
@@ -263,11 +274,11 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ video: buffer });
     }
 
-    // IMG
+    // 🖼️ IMG
     if (cmd === "img") {
       const quoted = msg.message.extendedTextMessage?.contextInfo;
       if (!quoted?.quotedMessage?.imageMessage)
-        return sock.sendMessage(from,{ text:"Reply image" });
+        return sock.sendMessage(from,{ text:"Reply image ku samee .img" });
 
       const stream = await downloadContentFromMessage(
         quoted.quotedMessage.imageMessage,"image"
@@ -280,27 +291,39 @@ sock.ev.on("messages.upsert", async ({ messages }) => {
       return sock.sendMessage(from,{ image: buffer });
     }
 
-    // MENU
+    // 📋 MENU
     if (cmd === "menu" || cmd === "help") {
       return sock.sendMessage(from,{
         text:`🤖 SHIIQ BOT FULL
 
-.hi
-.joke
-.geeraar
-.qisada 1-5
-.meme .roast
-.number
-.vv
-.img
-.tagall
-.hidetag
-.antilink on/off
-.kickall
-.presence on/off
-.song magaca`
+⚡ .hi
+😂 .joke
+❤️ .geeraar
+😢 .qisada 1-5
+
+🔥 .meme .roast
+🎲 .number
+
+🎬 .vv
+🖼️ .img
+👥 .tagall
+👻 .hidetag
+
+🔗 .antilink on/off
+🔥 .kickall
+
+👀 .presence on/off
+
+🎵 .song magaca
+
+❤️ .madaxey
+😂 .shiiq hoo biyo
+🎤 .shiiq axmad maxaa rabtaa
+🎶 .heestii axmad`
       });
     }
+
+    return sock.sendMessage(from,{ text:"😎 Amar lama garanayo" });
 
   } catch (e) {
     console.log(e);
@@ -312,22 +335,57 @@ isStarted = false;
 }
 }
 
-// 🌐 SERVER
+// 🌐 ROOT
 app.get("/", (req, res) => {
 res.send("BOT IS RUNNING ✅");
 });
 
-// 🔑 PAIR
-app.get("/pair", async (req, res) => {
+// 🔥 ULTRA PAIR PAGE
+app.get("/pair", (req, res) => {
+res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+<title>SHIIQ BOT ULTRA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{background:#020617;color:white;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh}
+.box{background:#0f172a;padding:30px;border-radius:15px;text-align:center;width:90%;max-width:400px;box-shadow:0 0 20px #22c55e}
+input{width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px}
+button{width:100%;padding:12px;margin-top:10px;background:#22c55e;border:none;border-radius:10px;color:white}
+#code{margin-top:15px;font-size:22px;color:#22c55e}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>🤖 SHIIQ BOT</h2>
+<input id="num" placeholder="25261XXXXXXX">
+<button onclick="go()">GET CODE</button>
+<div id="code"></div>
+</div>
+<script>
+async function go(){
+let n=document.getElementById("num").value;
+let r=await fetch("/getcode?number="+n);
+let t=await r.text();
+document.getElementById("code").innerHTML=t;
+navigator.clipboard.writeText(t);
+window.open("https://wa.me/"+n+"?text=PAIR CODE: "+t);
+}
+</script>
+</body>
+</html>
+`);
+});
+
+// 🔑 GET CODE
+app.get("/getcode", async (req, res) => {
 try {
-  const number = req.query.number;
-  if (!number) return res.send("Isticmaal: /pair?number=2526xxxx");
-
-  const code = await sock.requestPairingCode(number);
-  res.send(`<h2>PAIR CODE:</h2><h1>${code}</h1>`);
-
-} catch (err) {
-  res.send("Error: " + err.message);
+if (!sock) return res.send("⏳ Bot starting...");
+const code = await sock.requestPairingCode(req.query.number);
+res.send(code);
+} catch (e) {
+res.send("Error: " + e.message);
 }
 });
 
@@ -336,15 +394,15 @@ console.log("Server running on " + PORT);
 await startBot();
 });
 
-// KEEP ALIVE
+// 🔥 KEEP ALIVE
 setInterval(() => console.log("Bot still alive..."), 30000);
 
-// SELF PING
+// 🔥 SELF PING
 setInterval(async () => {
-  try {
-    await axios.get(process.env.KOYEB_URL);
-    console.log("Self ping OK");
-  } catch {
-    console.log("Ping error");
-  }
+try {
+await axios.get(process.env.KOYEB_URL);
+console.log("Self ping OK");
+} catch {
+console.log("Ping error");
+}
 }, 60000);
