@@ -1,3 +1,5 @@
+global.File = require("node:buffer").File;
+
 const express = require("express");
 const {
 default: makeWASocket,
