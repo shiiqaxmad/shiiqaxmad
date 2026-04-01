@@ -35,7 +35,9 @@ try {
 if (isStarted) return;
 isStarted = true;
 
-const { state, saveCreds } = await useMultiFileAuthState("./session");
+// ✅ SESSION FIX
+const { state, saveCreds } = await useMultiFileAuthState("./session2");
+
 const { version } = await fetchLatestBaileysVersion();
 
 sock = makeWASocket({
@@ -43,7 +45,6 @@ sock = makeWASocket({
   logger: P({ level: "silent" }),
   auth: state,
   browser: Browsers.macOS("Shiiq Bot"),
-
   keepAliveIntervalMs: 10000,
   connectTimeoutMs: 60000,
   defaultQueryTimeoutMs: 60000,
@@ -53,7 +54,7 @@ sock = makeWASocket({
 
 sock.ev.on("creds.update", saveCreds);
 
-// 🔥 CONNECTION FIX (408 FIX)
+// 🔥 CONNECTION FIX
 sock.ev.on("connection.update", (update) => {
   const { connection, lastDisconnect } = update;
 
@@ -68,14 +69,14 @@ sock.ev.on("connection.update", (update) => {
     isStarted = false;
 
     if (reason !== DisconnectReason.loggedOut) {
-      setTimeout(startBot, 3000);
+      setTimeout(startBot, 2000);
     } else {
       console.log("⚠️ Delete session kadib pair mar kale");
     }
   }
 });
 
-// 💬 COMMANDS (FULL - untouched)
+// 💬 COMMANDS (FULL - NOTHING REMOVED)
 sock.ev.on("messages.upsert", async ({ messages }) => {
 try {
 const msg = messages[0];
@@ -253,7 +254,7 @@ return sock.sendMessage(from,{text:"😎 Unknown command"});
 app.get("/",(req,res)=>res.send("BOT RUNNING"));
 app.get("/status",(req,res)=>res.send(sock?.user ? "READY" : "NOT READY"));
 
-// 🔥 PAIR PAGE FINAL HARD
+// 🔥 PAIR PAGE
 app.get("/pair",(req,res)=>{
 res.send(`
 <!DOCTYPE html>
@@ -261,28 +262,19 @@ res.send(`
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SHIIQ BOT</title>
-<style>
-body{background:#020617;color:white;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh}
-.box{background:#0f172a;padding:30px;border-radius:15px;text-align:center;width:90%;max-width:400px;box-shadow:0 0 25px #22c55e}
-input{width:100%;padding:12px;margin-top:10px;border:none;border-radius:10px;background:#1e293b;color:white}
-button{width:100%;padding:12px;margin-top:10px;background:#22c55e;border:none;border-radius:10px;color:white}
-#status{margin-top:15px}
-#code{margin-top:15px;font-size:20px;color:#22c55e}
-</style>
 </head>
-<body>
-<div class="box">
+<body style="background:#020617;color:white;text-align:center">
 <h2>🤖 SHIIQ BOT</h2>
 <input id="num" placeholder="25261XXXXXXX">
 <button onclick="g()">GET CODE</button>
-<div id="status">⏳ Checking...</div>
-<div id="code"></div>
-</div>
+<h3 id="status">...</h3>
+<h3 id="code"></h3>
+
 <script>
 setInterval(async ()=>{
 let r=await fetch("/status");
 let t=await r.text();
-status.innerHTML = t==="READY" ? "✅ READY" : "❌ NOT READY";
+status.innerHTML=t;
 },2000);
 
 async function g(){
@@ -295,7 +287,7 @@ code.innerHTML=await r.text();
 `);
 });
 
-// 🔑 GET CODE (FINAL FIX)
+// 🔑 GET CODE
 app.get("/getcode", async (req,res)=>{
 try{
 if(!sock) return res.send("⏳ starting...");
@@ -314,15 +306,3 @@ app.listen(PORT, async ()=>{
 console.log("RUNNING "+PORT);
 await startBot();
 });
-
-// KEEP ALIVE
-setInterval(()=>console.log("alive"),30000);
-
-// SELF PING
-setInterval(async ()=>{
-try{
-if(process.env.KOYEB_URL){
-await axios.get(process.env.KOYEB_URL);
-}
-}catch{}
-},60000);
