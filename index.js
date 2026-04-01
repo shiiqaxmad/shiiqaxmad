@@ -16,6 +16,7 @@ downloadContentFromMessage
 
 const P = require("pino");
 const yts = require("yt-search");
+const axios = require("axios");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -34,7 +35,7 @@ try {
 if (isStarted) return;
 isStarted = true;
 
-const { state, saveCreds } = await useMultiFileAuthState("./session2");
+const { state, saveCreds } = await useMultiFileAuthState("./session");
 const { version } = await fetchLatestBaileysVersion();
 
 sock = makeWASocket({
@@ -45,13 +46,16 @@ browser: Browsers.macOS("Shiiq Bot"),
 markOnlineOnConnect: true,
 });
 
+// SAVE SESSION
 sock.ev.on("creds.update", saveCreds);
 
-// CONNECTION FIX
+// CONNECTION
 sock.ev.on("connection.update", (update) => {
 const { connection, lastDisconnect } = update;
 
-if (connection === "open") console.log("✅ BOT READY");
+if (connection === "open") {
+console.log("✅ BOT READY 100%");
+}
 
 if (connection === "close") {
 const reason = lastDisconnect?.error?.output?.statusCode;
@@ -59,8 +63,12 @@ console.log("❌ Closed:", reason);
 
 isStarted = false;
 
-// auto reconnect
+// 🔥 FIX AUTO RECONNECT
+if (reason === 401) {
+console.log("⚠️ Session expired → delete session & pair again");
+} else {
 setTimeout(startBot, 3000);
+}
 }
 });
 
@@ -141,7 +149,7 @@ return sock.sendMessage(from,{text:`🎵 ${vid.title}\n${vid.url}`});
 // AUDIO
 if (cmd==="shiiq axmad maxaa rabtaa"){
 return sock.sendMessage(from,{
-audio:{url:"./AUD-20251226-WA0073.opus"},
+audio:{url:"./audio1.opus"},
 mimetype:"audio/ogg; codecs=opus",
 ptt:true
 });
@@ -149,7 +157,7 @@ ptt:true
 
 if (cmd==="heestii axmad"){
 return sock.sendMessage(from,{
-audio:{url:"./AUD-20260101-WA0120.mp3"},
+audio:{url:"./audio2.mp3"},
 mimetype:"audio/mp4",
 ptt:true
 });
@@ -160,77 +168,31 @@ if (cmd==="madaxey yaa waaye"){
 return sock.sendMessage(from,{text:"❤️ Waa jacaylka Shiiq Axmad"});
 }
 
-// MEDIA
-if (cmd==="vv"){
-const quoted=msg.message.extendedTextMessage?.contextInfo;
-if(!quoted?.quotedMessage?.videoMessage) return sock.sendMessage(from,{text:"Reply video"});
-const stream=await downloadContentFromMessage(quoted.quotedMessage.videoMessage,"video");
-let buffer=Buffer.from([]);
-for await(const chunk of stream) buffer=Buffer.concat([buffer,chunk]);
-return sock.sendMessage(from,{video:buffer});
-}
-
-if (cmd==="img"){
-const quoted=msg.message.extendedTextMessage?.contextInfo;
-if(!quoted?.quotedMessage?.imageMessage) return sock.sendMessage(from,{text:"Reply image"});
-const stream=await downloadContentFromMessage(quoted.quotedMessage.imageMessage,"image");
-let buffer=Buffer.from([]);
-for await(const chunk of stream) buffer=Buffer.concat([buffer,chunk]);
-return sock.sendMessage(from,{image:buffer});
-}
-
 // FUN
 if (cmd==="hi") return sock.sendMessage(from,{text:"👋 Wcs"});
 if (cmd==="joke") return sock.sendMessage(from,{text:"😂 Noloshu waa meme!"});
-if (cmd==="number") return sock.sendMessage(from,{text:"🎲 "+Math.floor(Math.random()*100)});
 
-// MONEY
-if (cmd==="balance") return sock.sendMessage(from,{text:"💰 "+users[from].money});
-if (cmd==="work"){
-let earn=Math.floor(Math.random()*50);
-users[from].money+=earn;
-return sock.sendMessage(from,{text:"💵 Waxaad heshay "+earn});
-}
-
-// MENU FULL
+// MENU
 if (cmd==="menu"){
 return sock.sendMessage(from,{text:`
-🤖 SHIIQ BOT PRO FULL
+🤖 SHIIQ BOT PRO
 
-🎧 AUDIO
 .shiiq axmad maxaa rabtaa
 .heestii axmad
-
-❤️ CUSTOM
 .madaxey yaa waaye
 
-📥 MEDIA
-.vv
-.img
-
-🎵 MUSIC
 .song magaca
-
-👥 GROUP
 .tagall
 
-💰 MONEY
 .balance
 .work
 
-😂 FUN
-.hi
-.joke
-.number
-
-⚙️ SETTINGS
+.autoreact on/off
 .antilink on/off
 .presence on/off
-.autoreact on/off
 `});
 }
 
-return sock.sendMessage(from,{text:"😎 Unknown"});
 }catch(e){console.log(e)}
 });
 } catch(err){isStarted=false}
@@ -239,21 +201,27 @@ return sock.sendMessage(from,{text:"😎 Unknown"});
 // ================= ROUTES =================
 app.get("/",(req,res)=>res.send("BOT RUNNING"));
 
-// STATUS (Heroku safe)
-app.get("/status",(req,res)=>res.send("READY"));
+// STATUS REAL
+app.get("/status",(req,res)=>{
+if(sock && sock.user){
+res.send("READY");
+}else{
+res.send("NOT READY");
+}
+});
 
-// PAIR PAGE
+// PAIR PAGE CLEAN
 app.get("/pair",(req,res)=>{
 res.send(`
-<html><body style="background:#020617;color:white;text-align:center">
+<html><body style="background:#0f172a;color:white;text-align:center">
 <h2>🤖 SHIIQ BOT PRO</h2>
-<input id="num" placeholder="25261XXXXXXX">
+<input id="num" placeholder="25261xxxxxxx">
 <button onclick="g()">GET CODE</button>
-<h3 id="c"></h3>
+<h3 id="out"></h3>
 <script>
 async function g(){
 let r=await fetch("/getcode?number="+num.value);
-c.innerHTML=await r.text();
+out.innerHTML=await r.text();
 }
 </script>
 </body></html>
@@ -263,9 +231,9 @@ c.innerHTML=await r.text();
 // GET CODE
 app.get("/getcode", async (req,res)=>{
 try{
-if(!sock) return res.send("⏳ starting...");
+if(!sock || !sock.user) return res.send("❌ Sug bot...");
 const number=(req.query.number||"").replace(/[^0-9]/g,"");
-if(!number) return res.send("❌ number geli");
+if(!number) return res.send("❌ Number geli");
 const code=await sock.requestPairingCode(number);
 res.send("✅ "+code);
 }catch(e){res.send("❌ "+e.message)}
@@ -276,3 +244,13 @@ app.listen(PORT,"0.0.0.0",async ()=>{
 console.log("RUNNING "+PORT);
 setTimeout(startBot,2000);
 });
+
+// KEEP ALIVE
+setInterval(()=>console.log("alive"),30000);
+
+// SELF PING (KU BADAL LINKAGA)
+setInterval(async ()=>{
+try{
+await axios.get("https://g-karola-shiiqbot-b484b9bc.koyeb.app/status");
+}catch(e){}
+},60000);
