@@ -16,7 +16,6 @@ downloadContentFromMessage
 
 const P = require("pino");
 const yts = require("yt-search");
-const axios = require("axios");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -46,16 +45,13 @@ browser: Browsers.macOS("Shiiq Bot"),
 markOnlineOnConnect: true,
 });
 
-// SAVE SESSION
 sock.ev.on("creds.update", saveCreds);
 
-// CONNECTION
+// CONNECTION FIX
 sock.ev.on("connection.update", (update) => {
 const { connection, lastDisconnect } = update;
 
-if (connection === "open") {
-console.log("✅ BOT READY 100%");
-}
+if (connection === "open") console.log("✅ BOT READY");
 
 if (connection === "close") {
 const reason = lastDisconnect?.error?.output?.statusCode;
@@ -63,12 +59,8 @@ console.log("❌ Closed:", reason);
 
 isStarted = false;
 
-// 🔥 SMART FIX
-if (reason === 401) {
-console.log("⚠️ Session expired → DELETE session2 & pair again");
-} else {
+// auto reconnect
 setTimeout(startBot, 3000);
-}
 }
 });
 
@@ -200,10 +192,10 @@ users[from].money+=earn;
 return sock.sendMessage(from,{text:"💵 Waxaad heshay "+earn});
 }
 
-// MENU
+// MENU FULL
 if (cmd==="menu"){
 return sock.sendMessage(from,{text:`
-🤖 SHIIQ BOT PRO
+🤖 SHIIQ BOT PRO FULL
 
 🎧 AUDIO
 .shiiq axmad maxaa rabtaa
@@ -247,14 +239,8 @@ return sock.sendMessage(from,{text:"😎 Unknown"});
 // ================= ROUTES =================
 app.get("/",(req,res)=>res.send("BOT RUNNING"));
 
-// ✅ REAL STATUS
-app.get("/status",(req,res)=>{
-if(sock && sock.user){
-res.send("READY");
-}else{
-res.send("NOT READY");
-}
-});
+// STATUS (Heroku safe)
+app.get("/status",(req,res)=>res.send("READY"));
 
 // PAIR PAGE
 app.get("/pair",(req,res)=>{
@@ -263,16 +249,11 @@ res.send(`
 <h2>🤖 SHIIQ BOT PRO</h2>
 <input id="num" placeholder="25261XXXXXXX">
 <button onclick="g()">GET CODE</button>
-<h3 id="status"></h3>
-<h3 id="code"></h3>
+<h3 id="c"></h3>
 <script>
-setInterval(async ()=>{
-let r=await fetch("/status");
-status.innerHTML=await r.text();
-},2000);
 async function g(){
 let r=await fetch("/getcode?number="+num.value);
-code.innerHTML=await r.text();
+c.innerHTML=await r.text();
 }
 </script>
 </body></html>
@@ -282,7 +263,7 @@ code.innerHTML=await r.text();
 // GET CODE
 app.get("/getcode", async (req,res)=>{
 try{
-if(!sock || !sock.user) return res.send("❌ Bot not ready, sug...");
+if(!sock) return res.send("⏳ starting...");
 const number=(req.query.number||"").replace(/[^0-9]/g,"");
 if(!number) return res.send("❌ number geli");
 const code=await sock.requestPairingCode(number);
@@ -290,18 +271,8 @@ res.send("✅ "+code);
 }catch(e){res.send("❌ "+e.message)}
 });
 
-// START
+// START SERVER
 app.listen(PORT,"0.0.0.0",async ()=>{
 console.log("RUNNING "+PORT);
 setTimeout(startBot,2000);
 });
-
-// KEEP ALIVE
-setInterval(()=>console.log("alive"),30000);
-
-// SELF PING (KOYEB)
-setInterval(async ()=>{
-try{
-await axios.get("https://g-karola-shiiqbot-b484b9bc.koyeb.app");
-}catch(e){}
-},60000);
