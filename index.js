@@ -287,22 +287,38 @@ code.innerHTML=await r.text();
 `);
 });
 
-// 🔑 GET CODE
+// 🔑 GET CODE (FIXED)
 app.get("/getcode", async (req,res)=>{
 try{
-if(!sock) return res.send("⏳ starting...");
-if(!sock.user) return res.send("❌ bot not ready");
+if(!sock) return res.send("⏳ Bot starting...");
+if(!sock.user) return res.send("❌ Bot not ready, sug...");
 
-const number=(req.query.number||"").replace(/[^0-9]/g,"");
-if(!number) return res.send("❌ number geli");
+const number = (req.query.number || "").replace(/[^0-9]/g,"");
+if(!number) return res.send("❌ Number geli (25261...)");
 
-const code=await sock.requestPairingCode(number);
-res.send("✅ "+code);
+// 🔥 muhiim: try/catch gudaha
+let code;
+try {
+  code = await sock.requestPairingCode(number);
+} catch (err) {
+  return res.send("❌ Code error, isku day mar kale");
+}
 
-}catch(e){res.send("❌ "+e.message)}
+res.send("✅ CODE: " + code);
+
+}catch(e){
+res.send("❌ Error: " + e.message);
+}
 });
 
-app.listen(PORT, async ()=>{
-console.log("RUNNING "+PORT);
-await startBot();
+
+// 🚀 SERVER START (FIXED)
+app.listen(PORT, "0.0.0.0", async ()=>{
+console.log("RUNNING " + PORT);
+
+// 🔥 muhiim: delay yar si sock u degto
+setTimeout(() => {
+  startBot();
+}, 2000);
+
 });
