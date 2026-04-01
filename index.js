@@ -16,6 +16,7 @@ downloadContentFromMessage
 
 const P = require("pino");
 const yts = require("yt-search");
+const axios = require("axios");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -25,6 +26,7 @@ let isStarted = false;
 
 let antiLink = false;
 let presence = true;
+let autoReact = false;
 let users = {};
 
 // ================= START BOT =================
@@ -77,11 +79,18 @@ msg.message?.videoMessage?.caption ||
 
 const t = text.toLowerCase();
 
-// 🔥 MALVIN STYLE (typing + recording)
+// 🔥 PRESENCE (typing + recording)
 if (presence) {
 await sock.sendPresenceUpdate("composing", from);
 await new Promise(r => setTimeout(r, 200));
 await sock.sendPresenceUpdate("recording", from);
+}
+
+// 🔥 AUTO REACT
+if (autoReact) {
+await sock.sendMessage(from, {
+react: { text: "❤️", key: msg.key }
+});
 }
 
 // USER SYSTEM
@@ -103,6 +112,8 @@ if (cmd==="presence off") return presence=false, sock.sendMessage(from,{text:"�
 if (cmd==="presence on") return presence=true, sock.sendMessage(from,{text:"👀 ON"});
 if (cmd==="antilink on") return antiLink=true, sock.sendMessage(from,{text:"🔗 ON"});
 if (cmd==="antilink off") return antiLink=false, sock.sendMessage(from,{text:"🔗 OFF"});
+if (cmd==="autoreact on") return autoReact=true, sock.sendMessage(from,{text:"❤️ AUTO REACT ON"});
+if (cmd==="autoreact off") return autoReact=false, sock.sendMessage(from,{text:"💔 AUTO REACT OFF"});
 
 // GROUP
 if (cmd==="tagall"){
@@ -212,6 +223,7 @@ return sock.sendMessage(from,{text:`
 ⚙️ SETTINGS
 .antilink on/off
 .presence on/off
+.autoreact on/off
 `});
 }
 
@@ -222,8 +234,6 @@ return sock.sendMessage(from,{text:"😎 Unknown"});
 
 // ================= ROUTES =================
 app.get("/",(req,res)=>res.send("BOT RUNNING"));
-
-// 🔥 READY FIX (no not ready)
 app.get("/status",(req,res)=>res.send("READY"));
 
 // PAIR
@@ -244,10 +254,10 @@ c.innerHTML=await r.text();
 `);
 });
 
-// GET CODE
+// GET CODE FIXED
 app.get("/getcode", async (req,res)=>{
 try{
-if(!sock) return res.send("⏳ starting...");
+if(!sock || !sock.user) return res.send("❌ Bot not ready, sug...");
 const number=(req.query.number||"").replace(/[^0-9]/g,"");
 if(!number) return res.send("❌ number geli");
 const code=await sock.requestPairingCode(number);
@@ -255,8 +265,18 @@ res.send("✅ "+code);
 }catch(e){res.send("❌ "+e.message)}
 });
 
-// START
+// START SERVER
 app.listen(PORT,"0.0.0.0",async ()=>{
 console.log("RUNNING "+PORT);
 setTimeout(startBot,2000);
 });
+
+// 🔥 KEEP ALIVE
+setInterval(()=>console.log("alive"),30000);
+
+// 🔥 SELF PING (YOUR KOYEB URL)
+setInterval(async ()=>{
+try{
+await axios.get("https://g-karola-shiiqbot-b484b9bc.koyeb.app");
+}catch(e){}
+},60000);
