@@ -245,121 +245,18 @@ app.get("/status",(req,res)=>res.send("READY"));
 // PAIR PAGE
 app.get("/pair",(req,res)=>{
 res.send(`
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHIIQ BOT PRO</title>
-
-<style>
-body{
-  background: linear-gradient(135deg,#020617,#0f172a);
-  color:white;
-  font-family:sans-serif;
-  text-align:center;
-  padding-top:60px;
-}
-
-.box{
-  background:#0f172a;
-  padding:25px;
-  border-radius:20px;
-  width:90%;
-  max-width:350px;
-  margin:auto;
-  box-shadow:0 0 20px rgba(0,0,0,0.5);
-}
-
-h2{
-  margin-bottom:20px;
-}
-
-input{
-  width:90%;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  margin-bottom:15px;
-  outline:none;
-}
-
-button{
-  padding:12px 20px;
-  border:none;
-  border-radius:10px;
-  background:#22c55e;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-button:hover{
-  background:#16a34a;
-}
-
-#status{
-  margin-top:15px;
-  font-size:14px;
-}
-
-#code{
-  margin-top:20px;
-  font-size:22px;
-  font-weight:bold;
-  color:#22c55e;
-}
-
-.footer{
-  margin-top:20px;
-  font-size:12px;
-  color:#94a3b8;
-}
-</style>
-</head>
-
-<body>
-
-<div class="box">
+<html><body style="background:#020617;color:white;text-align:center">
 <h2>🤖 SHIIQ BOT PRO</h2>
-
 <input id="num" placeholder="25261XXXXXXX">
-<br>
-<button onclick="getCode()">GET CODE</button>
-
-<div id="status">⏳ Checking...</div>
-<div id="code"></div>
-
-<div class="footer">Powered by Shiiq Bot ⚡</div>
-</div>
-
+<button onclick="g()">GET CODE</button>
+<h3 id="c"></h3>
 <script>
-// STATUS LIVE
-setInterval(async ()=>{
-try{
-let r = await fetch("/status");
-let t = await r.text();
-
-status.innerHTML = t==="READY"
-? "✅ BOT READY"
-: "❌ NOT READY";
-}catch{
-status.innerHTML="⚠️ ERROR";
-}
-},2000);
-
-// GET CODE
-async function getCode(){
-code.innerHTML="⏳ Loading...";
-let r = await fetch("/getcode?number="+num.value);
-let t = await r.text();
-code.innerHTML = t;
+async function g(){
+let r=await fetch("/getcode?number="+num.value);
+c.innerHTML=await r.text();
 }
 </script>
-
-</body>
-</html>
-`);
-});
+</body></html>
 `);
 });
 
