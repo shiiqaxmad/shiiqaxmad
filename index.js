@@ -31,6 +31,7 @@ let users = {};
 
 // ================= START BOT =================
 async function startBot() {
+try {
 if (isStarted) return;
 isStarted = true;
 
@@ -45,19 +46,29 @@ browser: Browsers.macOS("Shiiq Bot"),
 markOnlineOnConnect: true,
 });
 
+// SAVE SESSION
 sock.ev.on("creds.update", saveCreds);
 
 // CONNECTION
 sock.ev.on("connection.update", (update) => {
 const { connection, lastDisconnect } = update;
 
-if (connection === "open") console.log("✅ BOT READY");
+if (connection === "open") {
+console.log("✅ BOT READY 100%");
+}
 
 if (connection === "close") {
 const reason = lastDisconnect?.error?.output?.statusCode;
 console.log("❌ Closed:", reason);
+
 isStarted = false;
-if (reason !== DisconnectReason.loggedOut) setTimeout(startBot, 3000);
+
+// 🔥 SMART FIX
+if (reason === 401) {
+console.log("⚠️ Session expired → DELETE session2 & pair again");
+} else {
+setTimeout(startBot, 3000);
+}
 }
 });
 
@@ -79,21 +90,21 @@ msg.message?.videoMessage?.caption ||
 
 const t = text.toLowerCase();
 
-// 🔥 PRESENCE (typing + recording)
+// PRESENCE
 if (presence) {
 await sock.sendPresenceUpdate("composing", from);
 await new Promise(r => setTimeout(r, 200));
 await sock.sendPresenceUpdate("recording", from);
 }
 
-// 🔥 AUTO REACT
+// AUTO REACT
 if (autoReact) {
-await sock.sendMessage(from, {
-react: { text: "❤️", key: msg.key }
+await sock.sendMessage(from,{
+react:{ text:"❤️", key: msg.key }
 });
 }
 
-// USER SYSTEM
+// USERS
 if (!users[from]) users[from] = { money: 100 };
 
 // ANTILINK
@@ -103,17 +114,17 @@ await sock.groupParticipantsUpdate(from, [sender], "remove");
 return sock.sendMessage(from,{text:"🚫 Link lama ogola"});
 }
 
-// COMMAND CHECK
+// COMMAND
 if (!t.startsWith(".")) return;
 const cmd = t.slice(1);
 
 // SETTINGS
-if (cmd==="presence off") return presence=false, sock.sendMessage(from,{text:"🙈 OFF"});
 if (cmd==="presence on") return presence=true, sock.sendMessage(from,{text:"👀 ON"});
+if (cmd==="presence off") return presence=false, sock.sendMessage(from,{text:"🙈 OFF"});
 if (cmd==="antilink on") return antiLink=true, sock.sendMessage(from,{text:"🔗 ON"});
 if (cmd==="antilink off") return antiLink=false, sock.sendMessage(from,{text:"🔗 OFF"});
-if (cmd==="autoreact on") return autoReact=true, sock.sendMessage(from,{text:"❤️ AUTO REACT ON"});
-if (cmd==="autoreact off") return autoReact=false, sock.sendMessage(from,{text:"💔 AUTO REACT OFF"});
+if (cmd==="autoreact on") return autoReact=true, sock.sendMessage(from,{text:"❤️ ON"});
+if (cmd==="autoreact off") return autoReact=false, sock.sendMessage(from,{text:"💔 OFF"});
 
 // GROUP
 if (cmd==="tagall"){
@@ -189,7 +200,7 @@ users[from].money+=earn;
 return sock.sendMessage(from,{text:"💵 Waxaad heshay "+earn});
 }
 
-// MENU FULL
+// MENU
 if (cmd==="menu"){
 return sock.sendMessage(from,{text:`
 🤖 SHIIQ BOT PRO
@@ -230,31 +241,45 @@ return sock.sendMessage(from,{text:`
 return sock.sendMessage(from,{text:"😎 Unknown"});
 }catch(e){console.log(e)}
 });
+} catch(err){isStarted=false}
 }
 
 // ================= ROUTES =================
 app.get("/",(req,res)=>res.send("BOT RUNNING"));
-app.get("/status",(req,res)=>res.send("READY"));
 
-// PAIR
+// ✅ REAL STATUS
+app.get("/status",(req,res)=>{
+if(sock && sock.user){
+res.send("READY");
+}else{
+res.send("NOT READY");
+}
+});
+
+// PAIR PAGE
 app.get("/pair",(req,res)=>{
 res.send(`
 <html><body style="background:#020617;color:white;text-align:center">
 <h2>🤖 SHIIQ BOT PRO</h2>
 <input id="num" placeholder="25261XXXXXXX">
 <button onclick="g()">GET CODE</button>
-<h3 id="c"></h3>
+<h3 id="status"></h3>
+<h3 id="code"></h3>
 <script>
+setInterval(async ()=>{
+let r=await fetch("/status");
+status.innerHTML=await r.text();
+},2000);
 async function g(){
 let r=await fetch("/getcode?number="+num.value);
-c.innerHTML=await r.text();
+code.innerHTML=await r.text();
 }
 </script>
 </body></html>
 `);
 });
 
-// GET CODE FIXED
+// GET CODE
 app.get("/getcode", async (req,res)=>{
 try{
 if(!sock || !sock.user) return res.send("❌ Bot not ready, sug...");
@@ -265,16 +290,16 @@ res.send("✅ "+code);
 }catch(e){res.send("❌ "+e.message)}
 });
 
-// START SERVER
+// START
 app.listen(PORT,"0.0.0.0",async ()=>{
 console.log("RUNNING "+PORT);
 setTimeout(startBot,2000);
 });
 
-// 🔥 KEEP ALIVE
+// KEEP ALIVE
 setInterval(()=>console.log("alive"),30000);
 
-// 🔥 SELF PING (YOUR KOYEB URL)
+// SELF PING (KOYEB)
 setInterval(async ()=>{
 try{
 await axios.get("https://g-karola-shiiqbot-b484b9bc.koyeb.app");
