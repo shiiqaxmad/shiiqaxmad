@@ -5,7 +5,8 @@ const express = require("express");
 const {
 default: makeWASocket,
 useMultiFileAuthState,
-fetchLatestBaileysVersion
+fetchLatestBaileysVersion,
+DisconnectReason
 } = require("@whiskeysockets/baileys");
 
 const P = require("pino");
@@ -27,37 +28,55 @@ auth: state,
 printQRInTerminal: false,
 });
 
+// SAVE SESSION
 sock.ev.on("creds.update", saveCreds);
 
+// CONNECTION SYSTEM 🔥
 sock.ev.on("connection.update", (update) => {
-if (update.connection === "open") {
+const { connection, lastDisconnect } = update;
+
+if (connection === "open") {
 console.log("✅ BOT CONNECTED");
+}
+
+if (connection === "close") {
+const reason = lastDisconnect?.error?.output?.statusCode;
+console.log("❌ Closed:", reason);
+
+// AUTO RECONNECT
+if (reason !== DisconnectReason.loggedOut) {
+console.log("🔄 Reconnecting...");
+startBot();
+} else {
+console.log("⚠️ Session expired");
+}
 }
 });
 }
 
 // HOME
 app.get("/", (req,res)=>{
-res.send("⚡ SHIIQ FAST PAIR RUNNING");
+res.send("⚡ SHIIQ FAST PAIR PRO");
 });
 
-// PAIR PAGE (LIKE JAWAD)
-app.get("/pair", (req,res)=>{
+// 🔥 PRO PAIR PAGE
+app.get("/pair",(req,res)=>{
 res.send(`
 <html>
-<body style="background:#0f172a;color:white;text-align:center">
-<h2>⚡ FAST PAIR</h2>
+<body style="background:#0f172a;color:white;text-align:center;font-family:sans-serif">
 
-<input id="num" placeholder="25261xxxxxxx" style="padding:10px">
-<br><br>
+<h2>⚡ SHIIQ FAST PAIR</h2>
 
-<button onclick="g()" style="padding:10px">GET CODE</button>
+<input id="num" placeholder="25261xxxxxxx" style="padding:12px;border-radius:8px"><br><br>
+
+<button onclick="g()" style="padding:12px;border-radius:8px;background:#22c55e;color:white">GET CODE</button>
 
 <h2 id="out"></h2>
 
 <script>
 async function g(){
 let n=document.getElementById("num").value;
+
 document.getElementById("out").innerHTML="⏳ Generating...";
 
 let r=await fetch("/code?number="+n);
@@ -72,11 +91,12 @@ document.getElementById("out").innerHTML=t;
 `);
 });
 
-// GET CODE (FAST)
+// 🔥 FAST CODE
 app.get("/code", async (req,res)=>{
 try{
-const number=(req.query.number||"").replace(/[^0-9]/g,"");
+if(!sock) return res.send("⏳ Bot starting...");
 
+const number=(req.query.number||"").replace(/[^0-9]/g,"");
 if(!number) return res.send("❌ Enter number");
 
 const code = await sock.requestPairingCode(number);
@@ -88,8 +108,13 @@ res.send("❌ "+e.message);
 }
 });
 
-// START SERVER
+// START
 app.listen(PORT,"0.0.0.0", async ()=>{
 console.log("🌐 RUNNING "+PORT);
-await startBot();
+startBot();
 });
+
+// KEEP ALIVE
+setInterval(()=>{
+console.log("🤖 Alive...");
+},30000);
