@@ -1,1 +1,25 @@
-
+{
+  "name": "shiiq-md-bot",
+  "version": "3.0.0",
+  "description": "Shiiq Style WhatsApp Bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "keywords": [
+    "shiiq",
+    "md",
+    "whatsapp-bot",
+    "baileys"
+  ],
+  "author": "Shiiq",
+  "license": "MIT",
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "latest",
+    "archiver": "^7.0.1",
+    "express": "^4.19.2",
+    "pino": "^9.3.2"
+  }
+}
